@@ -10,10 +10,11 @@ namespace EgzaminelAPI.Context
     public interface ISubjectContext : IEgzaminelContext
     {
         Subject GetSubject(int id);
-        //ICollection<Subject> GetSubjects(int parentId);
+        ICollection<Subject> GetSubjects(int parentId);
         ApiResponse AddSubject(Subject subject, string userToken);
         ApiResponse EditSubject(Subject subject, string userToken);
         ApiResponse DeleteSubject(Subject subject, string userToken);
+        ICollection<SubjectEvent> GetSubjectEvents(Subject subject);
     }
 
     public class SubjectContext : EgzaminelContext, ISubjectContext
@@ -39,7 +40,8 @@ namespace EgzaminelAPI.Context
         public ApiResponse DeleteSubject(Subject subject, string userToken)
         {
             var user = GetUser(userToken, _repo);
-            var hasPermission = this.CheckEditPermissions(user.GroupsPermissions, subject.ParentGroup.Id);
+            var groupId = _repo.GetSubjectParentId(subject.Id);
+            var hasPermission = this.CheckEditPermissions(user.GroupsPermissions, groupId);
 
             if (!hasPermission) FailOnAuth();
 
@@ -49,7 +51,8 @@ namespace EgzaminelAPI.Context
         public ApiResponse EditSubject(Subject subject, string userToken)
         {
             var user = GetUser(userToken, _repo);
-            var hasPermission = this.CheckEditPermissions(user.GroupsPermissions, subject.ParentGroup.Id);
+            var groupId = _repo.GetSubjectParentId(subject.Id);
+            var hasPermission = this.CheckEditPermissions(user.GroupsPermissions, groupId);
 
             if (!hasPermission) FailOnAuth();
 
@@ -64,6 +67,11 @@ namespace EgzaminelAPI.Context
         public ICollection<Subject> GetSubjects(int parentId)
         {
             return _repo.GetSubjects(parentId);
+        }
+
+        public ICollection<SubjectEvent> GetSubjectEvents(Subject subject)
+        {
+            return _repo.GetSubjectEvents(subject.Id);
         }
     }
 }

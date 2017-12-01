@@ -9,3 +9,14 @@ C:\Users\t-rex\source\repos\EgzaminelAPI\EgzaminelAPI\obj\Debug\netcoreapp2.0\Eg
 C:\Users\t-rex\source\repos\EgzaminelAPI\EgzaminelAPI\obj\Debug\netcoreapp2.0\EgzaminelAPI.dll
 C:\Users\t-rex\source\repos\EgzaminelAPI\EgzaminelAPI\obj\Debug\netcoreapp2.0\EgzaminelAPI.pdb
 C:\Users\t-rex\source\repos\EgzaminelAPI\EgzaminelAPI\obj\Debug\netcoreapp2.0\EgzaminelAPI.csprojResolveAssemblyReference.cache
+C:\Users\t-rex\Documents\repos\EgzaminelAPI\EgzaminelAPI\bin\Debug\netcoreapp2.0\EgzaminelAPI.deps.json
+C:\Users\t-rex\Documents\repos\EgzaminelAPI\EgzaminelAPI\bin\Debug\netcoreapp2.0\EgzaminelAPI.runtimeconfig.json
+C:\Users\t-rex\Documents\repos\EgzaminelAPI\EgzaminelAPI\bin\Debug\netcoreapp2.0\EgzaminelAPI.runtimeconfig.dev.json
+C:\Users\t-rex\Documents\repos\EgzaminelAPI\EgzaminelAPI\bin\Debug\netcoreapp2.0\EgzaminelAPI.dll
+C:\Users\t-rex\Documents\repos\EgzaminelAPI\EgzaminelAPI\bin\Debug\netcoreapp2.0\EgzaminelAPI.pdb
+C:\Users\t-rex\Documents\repos\EgzaminelAPI\EgzaminelAPI\obj\Debug\netcoreapp2.0\EgzaminelAPI.csprojResolveAssemblyReference.cache
+C:\Users\t-rex\Documents\repos\EgzaminelAPI\EgzaminelAPI\obj\Debug\netcoreapp2.0\EgzaminelAPI.csproj.CoreCompileInputs.cache
+C:\Users\t-rex\Documents\repos\EgzaminelAPI\EgzaminelAPI\obj\Debug\netcoreapp2.0\EgzaminelAPI.AssemblyInfoInputs.cache
+C:\Users\t-rex\Documents\repos\EgzaminelAPI\EgzaminelAPI\obj\Debug\netcoreapp2.0\EgzaminelAPI.AssemblyInfo.cs
+C:\Users\t-rex\Documents\repos\EgzaminelAPI\EgzaminelAPI\obj\Debug\netcoreapp2.0\EgzaminelAPI.dll
+C:\Users\t-rex\Documents\repos\EgzaminelAPI\EgzaminelAPI\obj\Debug\netcoreapp2.0\EgzaminelAPI.pdb

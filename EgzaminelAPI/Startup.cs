@@ -40,6 +40,7 @@ namespace EgzaminelAPI
             services.AddScoped<ITokenService, TokenService>();
             services.AddScoped<IEgzaminelContext, EgzaminelContext>();
             services.AddScoped<IGroupsContext, GroupsContext>();
+            services.AddScoped<ISubjectContext, SubjectContext>();
             services.AddScoped<IEventsContext, EventsContext>();
             services.AddScoped<IUsersContext, UsersContext>();
             services.AddScoped<IMapper, Mapper>();
