@@ -96,7 +96,7 @@ namespace EgzaminelAPI.DataAccess
         {
             if (reader.HasRows)
             {
-                return GetSafeValue(reader, "group_id", () => reader.GetInt32("id"));
+                return GetSafeValue(reader, "group_id", () => reader.GetInt32("group_id"));
             }
             else
             {

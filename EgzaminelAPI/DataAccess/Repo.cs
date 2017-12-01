@@ -382,7 +382,7 @@ namespace EgzaminelAPI.DataAccess
         public ApiResponse UpdateSubject(Subject subject)
         {
             var query = String.Format(
-                @"UPDATE subjects SET name = '{0}', description = '{1}', WHERE subjects.id = {2}",
+                @"UPDATE subjects SET name = '{0}', description = '{1}' WHERE subjects.id = {2}",
                 PutSafeValue(subject.Name, () => subject.Name.ToString()),
                 PutSafeValue(subject.Description, () => subject.Description.ToString()),
                 PutSafeValue(subject.Id, () => subject.Id.ToString()));
