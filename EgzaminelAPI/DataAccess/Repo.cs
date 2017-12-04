@@ -2,7 +2,6 @@
 using EgzaminelAPI.Context;
 using EgzaminelAPI.Helpers;
 using EgzaminelAPI.Models;
-using EgzaminelAPI.Models;
 using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
@@ -16,45 +15,45 @@ namespace EgzaminelAPI.DataAccess
         TokenModel GetToken(string token);
         bool SaveToken(TokenModel token);
         bool UpdateToken(TokenModel token);
-        bool RemoveToken(string token);
-        bool RemoveTokenByUserId(int userId);
+        bool DeleteToken(string token);
+        bool DeleteTokenByUserId(int userId);
 
         // TODO implement section
         // Users
         int? GetUserId(string username, string password);
         User GetUser(int id);
         ICollection<User> GetUsers(IEnumerable<int> ids);
-        ApiResponse PostUser(User user);
-        ApiResponse UpdateUser(User user);
+        ApiResponse AddUser(User user);
+        ApiResponse EditUser(User user);
         ApiResponse DeleteUser(User user);
         IEnumerable<GroupPermission> GetGroupPermission(int userId);
         IEnumerable<SubjectGroupPermission> GetSubjectGroupPermission(int userId);
-        ApiResponse PostPermission(Permission permission);
-        ApiResponse UpdatePermission(Permission permission);
-        ApiResponse RemovePermission(Permission permission);
+        ApiResponse CreartePermission(Permission permission);
+        ApiResponse EditPermission(Permission permission);
+        ApiResponse DeletePermission(Permission permission);
 
         // Groups
-        Group GetGroup(int id); // implemented
+        Group GetGroup(int id);
         ICollection<Group> GetGroups(User user);
-        ApiResponse PostGroup(Group group, int ownerId);
-        ApiResponse UpdateGroup(Group group);
+        ApiResponse AddGroup(Group group, int ownerId);
+        ApiResponse EditGroup(Group group);
         ApiResponse DeleteGroup(Group group);
 
-        // TODO implement section
         // Subject
+        int GetSubjectParentId(int subjectId);
         Subject GetSubject(int id);
         ICollection<Subject> GetSubjects(int parentId);
-        ApiResponse PostSubject(Subject subject);
-        ApiResponse UpdateSubject(Subject subject);
+        ApiResponse AddSubject(Subject subject);
+        ApiResponse EditSubject(Subject subject);
         ApiResponse DeleteSubject(Subject subject);
 
         // TODO implement section
         // Subject groups
-        int GetSubjectParentId(int subjectId);
+        int GetSubjectGroupGroupId(int subjectGroupId);
         SubjectGroup GetSubjectGroup(int id);
         ICollection<SubjectGroup> GetSubjectGroups(int parentId); // implemented
-        ApiResponse PostSubjectGroup(SubjectGroup subjectGroup);
-        ApiResponse UpdateSubjectGroup(SubjectGroup subjectGroup);
+        ApiResponse AddSubjectGroup(SubjectGroup subjectGroup);
+        ApiResponse EditSubjectGroup(SubjectGroup subjectGroup);
         ApiResponse DeleteSubjectGroup(SubjectGroup subjectGroup);
 
         // Events
@@ -64,8 +63,8 @@ namespace EgzaminelAPI.DataAccess
         ICollection<GroupEvent> GetGroupEvents(int parentId);
         ICollection<SubjectEvent> GetSubjectEvents(int idparentId);
         ICollection<SubjectGroupEvent> GetSubjectGroupEvents(int parentId);
-        ApiResponse PostEvent(Event eventObject);
-        ApiResponse UpdateEvent(Event eventObject);
+        ApiResponse AddEvent(Event eventObject);
+        ApiResponse EditEvent(Event eventObject);
         ApiResponse DeleteEvent(Event eventObject);
     }
 
@@ -96,10 +95,10 @@ namespace EgzaminelAPI.DataAccess
                 @"REPLACE INTO users_token
                 (`auth_token`, `user_id`, `issued_on`,`expires_on`)
                 VALUES ('{0}', '{1}', {2}, {3})",
-                PutSafeValue(token.AuthToken, () => token.AuthToken.ToString()),
-                PutSafeValue(token.UserId, () => token.UserId.ToString()),
-                PutSafeValue(token.IssuedOn, () => ConvertDate(token.IssuedOn)),
-                PutSafeValue(token.ExpiresOn, () => ConvertDate(token.ExpiresOn)));
+                PutSafeValue(token.AuthToken, (x) => x.ToString()),
+                PutSafeValue(token.UserId, (x) => x.ToString()),
+                PutSafeValue(token.IssuedOn, (x) => ConvertDate(x)),
+                PutSafeValue(token.ExpiresOn, (x) => ConvertDate(x)));
 
             return EditItem(query, (code) => code > 0);
         }
@@ -108,27 +107,27 @@ namespace EgzaminelAPI.DataAccess
         {
             var query = String.Format(
                 @"UPDATE users_token SET `issued_on` = {0}, `expires_on` = {1} WHERE auth_token = '{2}'",
-                    PutSafeValue(token.IssuedOn, () => ConvertDate(token.IssuedOn)),
-                    PutSafeValue(token.ExpiresOn, () => ConvertDate(token.ExpiresOn)),
-                    PutSafeValue(token.AuthToken, () => token.AuthToken.ToString()));
+                    PutSafeValue(token.IssuedOn, (x) => ConvertDate(x)),
+                    PutSafeValue(token.ExpiresOn, (x) => ConvertDate(x)),
+                    PutSafeValue(token.AuthToken, (x) => x.ToString()));
 
             return EditItem(query, (code) => code > 0);
         }
 
-        public bool RemoveToken(string token)
+        public bool DeleteToken(string token)
         {
             var query = String.Format(
                 @"DELETE FROM users_token WHERE `auth_token` = {1}",
-                PutSafeValue(token, () => token));
+                PutSafeValue(token, (x) => x));
 
             return EditItem(query, (code) => code > 0);
         }
 
-        public bool RemoveTokenByUserId(int userId)
+        public bool DeleteTokenByUserId(int userId)
         {
             var query = String.Format(
                 @"DELETE FROM users_token WHERE `user_id` = {1}",
-                PutSafeValue(userId, () => userId.ToString()));
+                PutSafeValue(userId, (x) => x.ToString()));
 
             return EditItem(query, (code) => code > 0);
         }
@@ -179,17 +178,17 @@ namespace EgzaminelAPI.DataAccess
             return GetList(query, (reader) => _mapper.MapPermissions<SubjectGroupPermission>(reader));
         }
 
-        public ApiResponse PostPermission(Permission permission)
+        public ApiResponse CreartePermission(Permission permission)
         {
             var tableName = GetPermissionTableName(permission);
 
             var query = String.Format(@"INSERT INTO `{0}` (`user_id`, `object_id`, `has_admin_permission`, `can_modify`, `last_update`)
                                     VALUES ('{1}', '{2}', '{3}', '{4}', NULL)",
                                     tableName,
-                                    PutSafeValue(permission.UserId, () => permission.UserId.ToString()),
-                                    PutSafeValue(permission.ObjectId, () => permission.ObjectId.ToString()),
-                                    PutSafeValue(permission.HasAdminPermission, () => (Convert.ToInt32(permission.HasAdminPermission).ToString())),
-                                    PutSafeValue(permission.HasAdminPermission, () => (Convert.ToInt32(permission.CanModify).ToString())));
+                                    PutSafeValue(permission.UserId, (x) => x.ToString()),
+                                    PutSafeValue(permission.ObjectId, (x) => x.ToString()),
+                                    PutSafeValue(permission.HasAdminPermission, (x) => (Convert.ToInt32(x).ToString())),
+                                    PutSafeValue(permission.CanModify, (x) => (Convert.ToInt32(x).ToString())));
 
             return EditItem(query, (code) => new ApiResponse()
             {
@@ -198,16 +197,16 @@ namespace EgzaminelAPI.DataAccess
             });
         }
 
-        public ApiResponse UpdatePermission(Permission permission)
+        public ApiResponse EditPermission(Permission permission)
         {
             var tableName = GetPermissionTableName(permission);
             var query = String.Format(@"UPDATE `{0}` SET `user_id` = '{1}', `object_id` = '{2}', `has_admin_permission` = '{3}', `can_modify` = '{4}'
                                     WHERE `{0}`.user_id = '{1}' AND `{0}`.object_id = '{2}'",
                                     tableName,
-                                    PutSafeValue(permission.UserId, () => permission.UserId.ToString()),
-                                    PutSafeValue(permission.ObjectId, () => permission.ObjectId.ToString()),
-                                    PutSafeValue(permission.HasAdminPermission, () => (Convert.ToInt32(permission.HasAdminPermission).ToString())),
-                                    PutSafeValue(permission.HasAdminPermission, () => (Convert.ToInt32(permission.CanModify).ToString())));
+                                    PutSafeValue(permission.UserId, (x) => x.ToString()),
+                                    PutSafeValue(permission.ObjectId, (x) => x.ToString()),
+                                    PutSafeValue(permission.HasAdminPermission, (x) => (Convert.ToInt32(x).ToString())),
+                                    PutSafeValue(permission.CanModify, (x) => (Convert.ToInt32(x).ToString())));
 
             return EditItem(query, (code) => new ApiResponse()
             {
@@ -216,13 +215,13 @@ namespace EgzaminelAPI.DataAccess
             });
         }
 
-        public ApiResponse RemovePermission(Permission permission)
+        public ApiResponse DeletePermission(Permission permission)
         {
             var tableName = GetPermissionTableName(permission);
             var query = String.Format(@"DELETE FROM `{0}` WHERE `{0}.`user_id` = {1} AND `{0}.`object_id` = {2}",
                 tableName,
-                PutSafeValue(permission.UserId, () => permission.UserId.ToString()),
-                PutSafeValue(permission.ObjectId, () => permission.ObjectId.ToString()));
+                PutSafeValue(permission.UserId, (x) => x.ToString()),
+                PutSafeValue(permission.ObjectId, (x) => x.ToString()));
 
             return EditItem(query, (code) => new ApiResponse()
             {
@@ -275,15 +274,15 @@ namespace EgzaminelAPI.DataAccess
             return result;
         }
 
-        public ApiResponse PostGroup(Group group, int ownerId)
+        public ApiResponse AddGroup(Group group, int ownerId)
         {
             var query = String.Format(
                 @"INSERT INTO `groups` (`id`, `name`, `description`, `password`, `owner`, `last_update`)
                 VALUES (NULL, '{0}', '{1}', '{2}', '{3}', NULL); SELECT LAST_INSERT_ID()",
-                PutSafeValue(group.Name, () => group.Name.ToString()),
-                PutSafeValue(group.Description, () => group.Description.ToString()),
-                PutSafeValue(group.Password, () => group.Password.ToString()),
-                PutSafeValue(ownerId, () => ownerId.ToString()));
+                PutSafeValue(group.Name, (x) => x.ToString()),
+                PutSafeValue(group.Description, (x) => x.ToString()),
+                PutSafeValue(group.Password, (x) => x.ToString()),
+                PutSafeValue(ownerId, (x) => x.ToString()));
 
             return AddItem(query, (id) => new ApiResponse()
             {
@@ -292,14 +291,14 @@ namespace EgzaminelAPI.DataAccess
             });
         }
 
-        public ApiResponse UpdateGroup(Group group)
+        public ApiResponse EditGroup(Group group)
         {
             var query = String.Format(
                 @"UPDATE groups SET `name` = '{0}', `description` = '{1}', `password` = '{2}' WHERE `groups`.`id` = {3}",
-                PutSafeValue(group.Name, () => group.Name.ToString()),
-                PutSafeValue(group.Description, () => group.Description.ToString()),
-                PutSafeValue(group.Password, () => group.Password.ToString()),
-                PutSafeValue(group.Id, () => group.Id.ToString()));
+                PutSafeValue(group.Name, (x) => x.ToString()),
+                PutSafeValue(group.Description, (x) => x.ToString()),
+                PutSafeValue(group.Password, (x) => x.ToString()),
+                PutSafeValue(group.Id, (x) => x.ToString()));
 
             return EditItem(query, (code) => new ApiResponse()
             {
@@ -322,6 +321,16 @@ namespace EgzaminelAPI.DataAccess
         #endregion
 
         #region SUBJECTS
+
+        public int GetSubjectGroupGroupId(int subjectGroupId)
+        {
+            var query = String.Format(@"SELECT id FROM groups WHERE id = 
+	                                    (SELECT group_id FROM subjects WHERE id =
+     	                                (SELECT subject_id FROM subject_groups WHERE id = {0}))", subjectGroupId);
+            var result = GetItem(query, (reader) => _mapper.MapSubjectGroupGroupId(reader));
+
+            return result == null ? -1 : result.Value;
+        }
 
         public int GetSubjectParentId(int subjectId)
         {
@@ -363,14 +372,14 @@ namespace EgzaminelAPI.DataAccess
             return result;
         }
 
-        public ApiResponse PostSubject(Subject subject)
+        public ApiResponse AddSubject(Subject subject)
         {
             var query = String.Format(
                 @"INSERT INTO subjects (id, name, description, group_id, last_update)
                 VALUES (NULL, '{0}', '{1}', '{2}', NULL); SELECT LAST_INSERT_ID()",
-                PutSafeValue(subject.Name, () => subject.Name.ToString()),
-                PutSafeValue(subject.Description, () => subject.Description.ToString()),
-                PutSafeValue(subject.ParentGroup, () => subject.ParentGroup.Id.ToString()));
+                PutSafeValue(subject.Name, (x) => x.ToString()),
+                PutSafeValue(subject.Description, (x) => x.ToString()),
+                PutSafeValue(subject.ParentGroup, (x) => x.ToString()));
 
             return AddItem(query, (id) => new ApiResponse()
             {
@@ -379,13 +388,13 @@ namespace EgzaminelAPI.DataAccess
             });
         }
 
-        public ApiResponse UpdateSubject(Subject subject)
+        public ApiResponse EditSubject(Subject subject)
         {
             var query = String.Format(
                 @"UPDATE subjects SET name = '{0}', description = '{1}' WHERE subjects.id = {2}",
-                PutSafeValue(subject.Name, () => subject.Name.ToString()),
-                PutSafeValue(subject.Description, () => subject.Description.ToString()),
-                PutSafeValue(subject.Id, () => subject.Id.ToString()));
+                PutSafeValue(subject.Name, (x) => x.ToString()),
+                PutSafeValue(subject.Description, (x) => x.ToString()),
+                PutSafeValue(subject.Id, (x) => x.ToString()));
 
             return EditItem(query, (code) => new ApiResponse()
             {
@@ -409,9 +418,72 @@ namespace EgzaminelAPI.DataAccess
 
         #region SUBJECT GROUPS
 
-        public ICollection<SubjectGroup> GetSubjectGroups(int subjectId)
+        public SubjectGroup GetSubjectGroup(int id)
         {
-            var query = String.Format(@"SELECT * FROM subject_groups WHERE subject_id = {0}", subjectId);
+            var query = String.Format(@"SELECT * FROM subject_groups WHERE id = {0}", id);
+            var result = GetItem(query, (reader) => _mapper.MapSubjectGroup(reader));
+
+            if (result == null)
+            {
+                return null;
+            }
+
+            result.Events = GetSubjectGroupEvents(result.Id);
+
+            return result;
+        }
+
+        public ApiResponse AddSubjectGroup(SubjectGroup subjectGroup)
+        {
+            var query = String.Format(
+                @"INSERT INTO subject_groups (id, subject_id, place, teacher, description, last_update)
+                VALUES (NULL, '{0}', '{1}', '{2}', '{3}', NULL); SELECT LAST_INSERT_ID()",
+                PutSafeValue(subjectGroup.ParentSubject.Id, (x) => x.ToString()),
+                PutSafeValue(subjectGroup.Place, (x) => x.ToString()),
+                PutSafeValue(subjectGroup.Teacher, (x) => x.ToString()),
+                PutSafeValue(subjectGroup.Description, (x) => x.ToString()));
+
+            return AddItem(query, (id) => new ApiResponse()
+            {
+                IsSuccess = id >= 0,
+                ResultCode = id
+            });
+        }
+
+        public ApiResponse EditSubjectGroup(SubjectGroup subjectGroup)
+        {
+            var query = String.Format(
+                @"UPDATE subject_groups SET
+                                place = '{0}',
+                                teacher = '{1}',
+                                description = '{2}'
+                WHERE id = {3}",
+                PutSafeValue(subjectGroup.Place, (x) => x.ToString()),
+                PutSafeValue(subjectGroup.Teacher, (x) => x.ToString()),
+                PutSafeValue(subjectGroup.Description, (x) => x.ToString()),
+                PutSafeValue(subjectGroup.Id, (x) => x.ToString()));
+
+            return EditItem(query, (code) => new ApiResponse()
+            {
+                IsSuccess = code > 0,
+                ResultCode = code
+            });
+        }
+
+        public ApiResponse DeleteSubjectGroup(SubjectGroup subjectGroup)
+        {
+            var query = String.Format(@"DELETE FROM subject_groups WHERE id = {0}", subjectGroup.Id);
+
+            return EditItem(query, (code) => new ApiResponse()
+            {
+                IsSuccess = code > 0,
+                ResultCode = code
+            });
+        }
+
+        public ICollection<SubjectGroup> GetSubjectGroups(int parentId)
+        {
+            var query = String.Format(@"SELECT * FROM subject_groups WHERE subject_id = {0}", parentId);
             var result = GetCollection(query, (reader) => _mapper.MapSubjectGroups(reader));
             
             if (result.Count == 0)
@@ -466,7 +538,7 @@ namespace EgzaminelAPI.DataAccess
             return GetCollection(query, (reader) => _mapper.MapSubjectGroupEvents(reader));
         }
 
-        public ApiResponse PostEvent(Event eventObject)
+        public ApiResponse AddEvent(Event eventObject)
         {
             string tableName = GetEventTableName(eventObject);
 
@@ -475,11 +547,11 @@ namespace EgzaminelAPI.DataAccess
                 (`id`, `name`, `description`, `date`, `place`, `parent_id`, `last_update`)
                 VALUES (NULL, '{1}', '{2}', {3}, '{4}', '{5}', NULL)",
                 tableName,
-                PutSafeValue(eventObject.Name, () => eventObject.Name.ToString()),
-                PutSafeValue(eventObject.Description, () => eventObject.Description.ToString()),
-                PutSafeValue(eventObject, () => ConvertDate(eventObject.Date)),
-                PutSafeValue(eventObject, () => eventObject.Place.ToString()),
-                PutSafeValue(eventObject, () => eventObject.ParentId.ToString()));
+                PutSafeValue(eventObject.Name, (x) => x.ToString()),
+                PutSafeValue(eventObject.Description, (x) => x.ToString()),
+                PutSafeValue(eventObject.Date, (x) => ConvertDate(x)),
+                PutSafeValue(eventObject.Place, (x) => x.ToString()),
+                PutSafeValue(eventObject.ParentId, (x) => x.ToString()));
 
             return EditItem(query, (code) => new ApiResponse()
             {
@@ -488,7 +560,7 @@ namespace EgzaminelAPI.DataAccess
             });
         }
 
-        public ApiResponse UpdateEvent(Event eventObject)
+        public ApiResponse EditEvent(Event eventObject)
         {
             string tableName = GetEventTableName(eventObject);
 
@@ -497,11 +569,11 @@ namespace EgzaminelAPI.DataAccess
             var query = String.Format(
                 @"UPDATE `{0}` SET `name` = '{1}', `description` = '{2}', `date` = {3}, `place` = '{4}' WHERE `{0}`.`id` = {5}",
                 tableName,
-                PutSafeValue(eventObject.Name, () => eventObject.Name.ToString()),
-                PutSafeValue(eventObject.Description, () => eventObject.Description.ToString()),
-                PutSafeValue(eventObject.Date, () => ConvertDate(eventObject.Date)),
-                PutSafeValue(eventObject.Place, () => eventObject.Place.ToString()),
-                PutSafeValue(eventObject.Id, () => eventObject.Id.ToString()));
+                PutSafeValue(eventObject.Name, (x) => x.ToString()),
+                PutSafeValue(eventObject.Description, (x) => x.ToString()),
+                PutSafeValue(eventObject.Date, (x) => ConvertDate(x)),
+                PutSafeValue(eventObject.Place, (x) => x.ToString()),
+                PutSafeValue(eventObject.Id, (x) => x.ToString()));
 
             return EditItem(query, (code) => new ApiResponse()
             {
@@ -518,7 +590,7 @@ namespace EgzaminelAPI.DataAccess
             var query = String.Format(
                 @"DELETE FROM `{0}` WHERE `{0}`.`id` = {1}",
                 tableName,
-                PutSafeValue(eventObject.Id, () => eventObject.Id.ToString()));
+                PutSafeValue(eventObject.Id, (x) => x.ToString()));
 
             return EditItem(query, (code) => new ApiResponse()
             {
@@ -531,7 +603,7 @@ namespace EgzaminelAPI.DataAccess
 
         #region HELPERS        
 
-        private string PutSafeValue<T>(T value, Func<string> mapper)
+        private string PutSafeValue<T>(T value, Func<T, string> mapper)
         {
             if (value == null || value.ToString() == "")
             {
@@ -540,7 +612,7 @@ namespace EgzaminelAPI.DataAccess
             }
             else
             {
-                return mapper.Invoke();
+                return mapper.Invoke(value);
             }
         }
 
@@ -643,37 +715,17 @@ namespace EgzaminelAPI.DataAccess
 
         #region NOT_IMPLEMENTED
 
-        public ApiResponse PostUser(User user)
+        public ApiResponse AddUser(User user)
         {
             throw new NotImplementedException();
         }
 
-        public ApiResponse UpdateUser(User user)
+        public ApiResponse EditUser(User user)
         {
             throw new NotImplementedException();
         }
 
         public ApiResponse DeleteUser(User user)
-        {
-            throw new NotImplementedException();
-        }
-
-        public SubjectGroup GetSubjectGroup(int id)
-        {
-            throw new NotImplementedException();
-        }
-
-        public ApiResponse PostSubjectGroup(SubjectGroup subjectGroup)
-        {
-            throw new NotImplementedException();
-        }
-
-        public ApiResponse UpdateSubjectGroup(SubjectGroup subjectGroup)
-        {
-            throw new NotImplementedException();
-        }
-
-        public ApiResponse DeleteSubjectGroup(SubjectGroup subjectGroup)
         {
             throw new NotImplementedException();
         }

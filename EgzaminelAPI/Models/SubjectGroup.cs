@@ -27,5 +27,8 @@ namespace EgzaminelAPI.Models
 
         [DataMember(Order = 6)]
         public ICollection<SubjectGroupEvent> Events { get; set; }
+
+        [IgnoreDataMember]
+        public Subject ParentSubject { get; set; }
     }
 }

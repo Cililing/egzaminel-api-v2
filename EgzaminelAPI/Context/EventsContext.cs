@@ -63,7 +63,7 @@ namespace EgzaminelAPI.Context
                 FailOnAuth();
             }
 
-            return _repo.PostEvent(groupEvent);
+            return _repo.AddEvent(groupEvent);
         }
 
         public ApiResponse PostSubjectEvent(SubjectEvent subjectEvent, string userToken)
@@ -78,7 +78,7 @@ namespace EgzaminelAPI.Context
                 FailOnAuth();
             }
 
-            return _repo.PostEvent(subjectEvent);
+            return _repo.AddEvent(subjectEvent);
         }
 
         public ApiResponse PostSubjectGroupEvent(SubjectGroupEvent subjectGroupEvent, string userToken)
@@ -88,7 +88,7 @@ namespace EgzaminelAPI.Context
 
             if (!hasPermission) FailOnAuth();
 
-            return _repo.PostEvent(subjectGroupEvent);
+            return _repo.AddEvent(subjectGroupEvent);
         }
 
         public ApiResponse UpdateGroupEvent(GroupEvent groupEvent, string userToken)
@@ -102,7 +102,7 @@ namespace EgzaminelAPI.Context
             {
                 FailOnAuth();
             }
-            return _repo.UpdateEvent(groupEvent);
+            return _repo.EditEvent(groupEvent);
         }
 
         public ApiResponse UpdateSubjectEvent(SubjectEvent subjectEvent, string userToken)
@@ -112,7 +112,7 @@ namespace EgzaminelAPI.Context
 
             if (!hasPermission) FailOnAuth();
 
-            return _repo.UpdateEvent(subjectEvent);
+            return _repo.EditEvent(subjectEvent);
         }
 
         public ApiResponse UpdateSubjectGroupEvent(SubjectGroupEvent subjectGroupEvent, string userToken)
@@ -122,7 +122,7 @@ namespace EgzaminelAPI.Context
 
             if (!hasPermission) FailOnAuth();
 
-            return _repo.UpdateEvent(subjectGroupEvent);
+            return _repo.EditEvent(subjectGroupEvent);
         }
 
         public ApiResponse DeleteGroupEvent(GroupEvent groupEvent, string userToken)
@@ -132,7 +132,7 @@ namespace EgzaminelAPI.Context
 
             if (!hasPermission) FailOnAuth();
 
-            return _repo.UpdateEvent(groupEvent);
+            return _repo.EditEvent(groupEvent);
         }
 
         public ApiResponse DeleteSubjectEvent(SubjectEvent subjectEvent, string userToken)
@@ -142,7 +142,7 @@ namespace EgzaminelAPI.Context
 
             if (!hasPermission) FailOnAuth();
 
-            return _repo.UpdateEvent(subjectEvent);
+            return _repo.EditEvent(subjectEvent);
         }
 
         public ApiResponse DeleteSubjectGroupEvent(SubjectGroupEvent subjectGroupEvent, string userToken)
@@ -152,7 +152,7 @@ namespace EgzaminelAPI.Context
 
             if (!hasPermission) FailOnAuth();
 
-            return _repo.UpdateEvent(subjectGroupEvent);
+            return _repo.EditEvent(subjectGroupEvent);
         }
     }
 }

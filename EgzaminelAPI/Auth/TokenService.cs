@@ -62,12 +62,12 @@ namespace EgzaminelAPI.Auth
 
         public bool KillToken(string tokenId)
         {
-            return _repository.RemoveToken(tokenId);
+            return _repository.DeleteToken(tokenId);
         }
 
         public bool DeleteTokenByUserId(int userId)
         {
-            return _repository.RemoveTokenByUserId(userId);
+            return _repository.DeleteTokenByUserId(userId);
         }
 
         private void RefreshTokenTime(ref TokenModel tokenModel)

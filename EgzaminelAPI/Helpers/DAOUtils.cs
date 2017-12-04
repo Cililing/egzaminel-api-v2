@@ -56,6 +56,7 @@ namespace EgzaminelAPI.Helpers
                 default:
                     return default(T);
             }
+
             return default(T);
         }
     }

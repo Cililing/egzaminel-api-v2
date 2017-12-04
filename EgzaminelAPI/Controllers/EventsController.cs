@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using EgzaminelAPI.Models;
 using EgzaminelAPI.Context;
-using EgzaminelAPI.Models;
 
 namespace EgzaminelAPI.Helpers
 {

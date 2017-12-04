@@ -36,7 +36,7 @@ namespace EgzaminelAPI.Controllers
             return _subjectContext.GetSubject(id);
         }
 
-        [Route("group/{id}")]
+        [Route("parent/{id}")]
         public ICollection<Subject> GetSubjects(int id)
         {
             return _subjectContext.GetSubjects(id);

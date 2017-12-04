@@ -40,8 +40,8 @@ namespace EgzaminelAPI.Context
             if (user == null) FailOnAuth();
 
             group.Owner = user;
-            var result = _repo.PostGroup(group, user.Id);
-            _repo.PostPermission(new GroupPermission()
+            var result = _repo.AddGroup(group, user.Id);
+            _repo.CreartePermission(new GroupPermission()
             {
                 UserId = user.Id,
                 ObjectId = result.ResultCode,
@@ -64,7 +64,7 @@ namespace EgzaminelAPI.Context
 
             if (CheckEditPermissions(user.GroupsPermissions, group.Id))
             {
-                return _repo.UpdateGroup(group);
+                return _repo.EditGroup(group);
             }
             else
             {

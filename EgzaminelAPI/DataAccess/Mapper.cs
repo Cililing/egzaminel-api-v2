@@ -1,6 +1,5 @@
 ﻿using EgzaminelAPI.Auth;
 using EgzaminelAPI.Models;
-using EgzaminelAPI.Models;
 using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
@@ -14,6 +13,7 @@ namespace EgzaminelAPI.DataAccess
         User MapUser(MySqlDataReader reader);
         ICollection<User> MapUsers(MySqlDataReader reader);
         int? MapSubjectParentId(MySqlDataReader reader);
+        int? MapSubjectGroupGroupId(MySqlDataReader reader);
         IEnumerable<T> MapPermissions<T>(MySqlDataReader reader) where T : Permission, new();
 
 
@@ -103,6 +103,18 @@ namespace EgzaminelAPI.DataAccess
                 return null;
             }
         }
+
+        public int? MapSubjectGroupGroupId(MySqlDataReader reader)
+        {
+            if (reader.HasRows)
+            {
+                return GetSafeValue(reader, "id", () => reader.GetInt32("id"));
+            }
+            else
+            {
+                return null;
+            }
+        } 
 
         public TokenModel MapToken(MySqlDataReader reader)
         {

@@ -34,7 +34,7 @@ namespace EgzaminelAPI.Context
 
             if (!hasPermission) FailOnAuth();
 
-            return _repo.PostSubject(subject);
+            return _repo.AddSubject(subject);
         }
 
         public ApiResponse DeleteSubject(Subject subject, string userToken)
@@ -56,7 +56,7 @@ namespace EgzaminelAPI.Context
 
             if (!hasPermission) FailOnAuth();
 
-            return _repo.UpdateSubject(subject);
+            return _repo.EditSubject(subject);
         }
 
         public Subject GetSubject(int id)
