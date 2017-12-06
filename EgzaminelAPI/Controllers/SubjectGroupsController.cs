@@ -15,8 +15,8 @@ namespace EgzaminelAPI.Controllers
     {
         SubjectGroup GetSubjectGroup(int id);
         ICollection<SubjectGroup> GetSubjectGroups(int parentId);
-        ApiResponse AddSubjectGroup(string place, string teacher, string description, int subjectId);
-        ApiResponse UpdateSubject(int id, string place, string teacher, string description);
+        ApiResponse AddSubjectGroup(int subjectId, SubjectGroup subjectGroup);
+        ApiResponse UpdateSubject(int id, SubjectGroup subjectGroup);
         ApiResponse RemoveSubject(int id);
         IEnumerable<SubjectGroupEvent> GetSubjectGroupEvents(int id);
     }
@@ -51,34 +51,22 @@ namespace EgzaminelAPI.Controllers
         }
 
         [Authorize(Policy = "TokenValidation")]
-        [Route("add")]
-        public ApiResponse AddSubjectGroup(string place, string teacher, string description, int subjectId)
+        [HttpPost]
+        [Route("add/{subjectId}")]
+        public ApiResponse AddSubjectGroup(int subjectId, [FromBody] SubjectGroup subjectGroup)
         {
             var userToken = this.GetAuthTokenFromHttpContext();
-            var subjectGroup = new SubjectGroup()
-            {
-                Place = place,
-                Teacher = teacher,
-                Description = description,
-                ParentSubject = new Subject { Id = subjectId }
-            };
-
+            subjectGroup.ParentSubject = new Subject { Id = subjectId };
             return _subjectGroupContext.AddSubjectGroup(subjectGroup, userToken);
         }
 
         [Authorize(Policy = "TokenValidation")]
+        [HttpPost]
         [Route("update/{id}")]
-        public ApiResponse UpdateSubject(int id, string place, string teacher, string description)
+        public ApiResponse UpdateSubject(int id, [FromBody] SubjectGroup subjectGroup)
         {
             var userToken = this.GetAuthTokenFromHttpContext();
-            var subjectGroup = new SubjectGroup()
-            {
-                Id = id,
-                Place = place,
-                Teacher = teacher,
-                Description = description
-            };
-
+            subjectGroup.Id = id;
             return _subjectGroupContext.EditSubjectGroup(subjectGroup, userToken);
         }
 

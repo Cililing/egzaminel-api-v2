@@ -245,9 +245,9 @@ namespace EgzaminelAPI.DataAccess
             }
 
             var groupId = result.Id;
-            var events = GetGroupEvents(groupId);
+            var events = GetGroupEvents(groupId.Value);
             result.Events = events;
-            result.Subjects = GetSubjects(groupId);
+            result.Subjects = GetSubjects(groupId.Value);
 
             return result;
         }
@@ -266,9 +266,9 @@ namespace EgzaminelAPI.DataAccess
             ForEach(result, (group) =>
             {
                 var groupId = group.Id;
-                var events = GetGroupEvents(groupId);
+                var events = GetGroupEvents(groupId.Value);
                 group.Events = events;
-                group.Subjects = GetSubjects(groupId);
+                group.Subjects = GetSubjects(groupId.Value);
             });
 
             return result;
@@ -379,7 +379,7 @@ namespace EgzaminelAPI.DataAccess
                 VALUES (NULL, '{0}', '{1}', '{2}', NULL); SELECT LAST_INSERT_ID()",
                 PutSafeValue(subject.Name, (x) => x.ToString()),
                 PutSafeValue(subject.Description, (x) => x.ToString()),
-                PutSafeValue(subject.ParentGroup, (x) => x.ToString()));
+                PutSafeValue(subject.ParentGroup.Id, (x) => x.ToString()));
 
             return AddItem(query, (id) => new ApiResponse()
             {

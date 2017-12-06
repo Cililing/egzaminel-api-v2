@@ -62,7 +62,7 @@ namespace EgzaminelAPI.Context
             // check permission
             var permissions = user.GroupsPermissions.Where(x => x.ObjectId == group.Id);
 
-            if (CheckEditPermissions(user.GroupsPermissions, group.Id))
+            if (CheckEditPermissions(user.GroupsPermissions, group.Id.Value))
             {
                 return _repo.EditGroup(group);
             }
@@ -80,7 +80,7 @@ namespace EgzaminelAPI.Context
 
             if (user == null || user.GroupsPermissions == null) FailOnAuth();
 
-            if (CheckAdminPermissions(user.GroupsPermissions, group.Id))
+            if (CheckAdminPermissions(user.GroupsPermissions, group.Id.Value))
             {
                 return _repo.DeleteGroup(group);
             }

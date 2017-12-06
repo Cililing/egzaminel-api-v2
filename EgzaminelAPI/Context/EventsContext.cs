@@ -1,6 +1,5 @@
 ﻿using EgzaminelAPI.DataAccess;
 using EgzaminelAPI.Models;
-using EgzaminelAPI.Models;
 using System.Collections.Generic;
 
 namespace EgzaminelAPI.Context

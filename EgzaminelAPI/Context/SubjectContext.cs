@@ -30,7 +30,7 @@ namespace EgzaminelAPI.Context
         public ApiResponse AddSubject(Subject subject, string userToken)
         {
             var user = GetUser(userToken, _repo);
-            var hasPermission = this.CheckEditPermissions(user.GroupsPermissions, subject.ParentGroup.Id);
+            var hasPermission = this.CheckEditPermissions(user.GroupsPermissions, subject.ParentGroup.Id.Value);
 
             if (!hasPermission) FailOnAuth();
 
