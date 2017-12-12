@@ -8,6 +8,10 @@ namespace EgzaminelAPI.Context
     public interface IUsersContext
     {
         User GetUser(int id);
+        ApiResponse RegisterUser(string username, string password);
+        ApiResponse EditUser(User user);
+        ApiResponse RemoveUser(User user);
+
         string ValidateUser(string username, string password);
     }
 
@@ -22,9 +26,24 @@ namespace EgzaminelAPI.Context
             this._repo = repo;
         }
 
+        public ApiResponse EditUser(User user)
+        {
+            throw new System.NotImplementedException();
+        }
+
         public User GetUser(int id)
         {
             return _repo.GetUser(id);
+        }
+
+        public ApiResponse RegisterUser(string username, string password)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public ApiResponse RemoveUser(User user)
+        {
+            throw new System.NotImplementedException();
         }
 
         public string ValidateUser(string username, string password)

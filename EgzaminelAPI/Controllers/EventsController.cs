@@ -113,8 +113,7 @@ namespace EgzaminelAPI.Helpers
         [HttpDelete]
         public ApiResponse DeleteGroupEvent(int id)
         {
-            var userToken = this.GetAuthTokenFromHttpContext();
-            return _eventContext.DeleteGroupEvent(new GroupEvent() { Id = id }, userToken);
+            return DeleteEventObjectByType(id, new GroupEvent() { Id = id });
         }
 
         [Authorize(Policy = "TokenValidation")]
@@ -122,8 +121,7 @@ namespace EgzaminelAPI.Helpers
         [HttpDelete]
         public ApiResponse DeleteSubjectEvent(int id)
         {
-            var userToken = this.GetAuthTokenFromHttpContext();
-            return _eventContext.DeleteSubjectEvent(new SubjectEvent() { Id = id }, userToken);
+            return DeleteEventObjectByType(id, new SubjectEvent() { Id = id });
         }
 
         [Authorize(Policy = "TokenValidation")]
@@ -131,8 +129,7 @@ namespace EgzaminelAPI.Helpers
         [HttpDelete]
         public ApiResponse DeleteSubjectGroupEvent(int id)
         {
-            var userToken = this.GetAuthTokenFromHttpContext();
-            return _eventContext.DeleteSubjectGroupEvent(new SubjectGroupEvent() { Id = id }, userToken);
+            return DeleteEventObjectByType(id, new SubjectGroupEvent() { Id = id });
         }
 
         private ApiResponse PostEventObjectByType(int parentId, Event eventObject)
@@ -153,6 +150,16 @@ namespace EgzaminelAPI.Helpers
                 () => _eventContext.UpdateGroupEvent(eventObject as GroupEvent, userToken),
                 () => _eventContext.UpdateSubjectEvent(eventObject as SubjectEvent, userToken),
                 () => _eventContext.UpdateSubjectGroupEvent(eventObject as SubjectGroupEvent, userToken));
+        }
+
+        private ApiResponse DeleteEventObjectByType(int id, Event eventObject)
+        {
+            var userToken = this.GetAuthTokenFromHttpContext();
+            eventObject.Id = id;
+            return DAOUtils.DoByEventType<ApiResponse>(eventObject,
+                () => _eventContext.RemoveGroupEvent(eventObject as GroupEvent, userToken),
+                () => _eventContext.RemoveSubjectEvent(eventObject as SubjectEvent, userToken),
+                () => _eventContext.RemoveSubjectGroupEvent(eventObject as SubjectGroupEvent, userToken));
         }
     }
 }

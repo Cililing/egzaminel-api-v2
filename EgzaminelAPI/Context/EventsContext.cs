@@ -16,9 +16,9 @@ namespace EgzaminelAPI.Context
         ApiResponse UpdateGroupEvent(GroupEvent groupEvent, string userToken);
         ApiResponse UpdateSubjectEvent(SubjectEvent subjectEvent, string userToken);
         ApiResponse UpdateSubjectGroupEvent(SubjectGroupEvent subjectGroupEvent, string userToken);
-        ApiResponse DeleteGroupEvent(GroupEvent groupEvent, string userToken);
-        ApiResponse DeleteSubjectEvent(SubjectEvent subjectEvent, string userToken);
-        ApiResponse DeleteSubjectGroupEvent(SubjectGroupEvent subjectGroupEvent, string userToken);
+        ApiResponse RemoveGroupEvent(GroupEvent groupEvent, string userToken);
+        ApiResponse RemoveSubjectEvent(SubjectEvent subjectEvent, string userToken);
+        ApiResponse RemoveSubjectGroupEvent(SubjectGroupEvent subjectGroupEvent, string userToken);
     }
 
     public class EventsContext : EgzaminelContext, IEventsContext
@@ -55,7 +55,7 @@ namespace EgzaminelAPI.Context
             var user = GetUser(userToken, _repo);
 
             // Check edit permissions
-            var hasPermission = CheckEditPermissions(user.GroupsPermissions, groupEvent.ParentId);
+            var hasPermission = CheckAnyPermissions(user.GroupsPermissions, groupEvent.ParentId);
 
             if (!hasPermission)
             {
@@ -71,7 +71,7 @@ namespace EgzaminelAPI.Context
             var user = GetUser(userToken, _repo);
 
             // Check edit permissions
-            var hasPermission = CheckEditPermissions(user.GroupsPermissions, _repo.GetSubjectParentId(subjectEvent.ParentId));
+            var hasPermission = CheckAnyPermissions(user.GroupsPermissions, _repo.GetSubjectParentId(subjectEvent.ParentId));
             if (!hasPermission)
             {
                 FailOnAuth();
@@ -83,7 +83,7 @@ namespace EgzaminelAPI.Context
         public ApiResponse PostSubjectGroupEvent(SubjectGroupEvent subjectGroupEvent, string userToken)
         {
             var user = GetUser(userToken, _repo);
-            var hasPermission = CheckEditPermissions(user.SubjectGroupsPermissions, subjectGroupEvent.ParentId);
+            var hasPermission = CheckAnyPermissions(user.SubjectGroupsPermissions, subjectGroupEvent.ParentId);
 
             if (!hasPermission) FailOnAuth();
 
@@ -95,7 +95,7 @@ namespace EgzaminelAPI.Context
             var user = GetUser(userToken, _repo);
 
             // Check edit permissions
-            var hasPermission = CheckEditPermissions(user.GroupsPermissions, groupEvent.ParentId);
+            var hasPermission = CheckAnyPermissions(user.GroupsPermissions, groupEvent.ParentId);
 
             if (!hasPermission)
             {
@@ -107,7 +107,7 @@ namespace EgzaminelAPI.Context
         public ApiResponse UpdateSubjectEvent(SubjectEvent subjectEvent, string userToken)
         {
             var user = GetUser(userToken, _repo);
-            var hasPermission = CheckEditPermissions(user.GroupsPermissions, _repo.GetSubjectParentId(subjectEvent.ParentId));
+            var hasPermission = CheckAnyPermissions(user.GroupsPermissions, _repo.GetSubjectParentId(subjectEvent.ParentId));
 
             if (!hasPermission) FailOnAuth();
 
@@ -117,41 +117,53 @@ namespace EgzaminelAPI.Context
         public ApiResponse UpdateSubjectGroupEvent(SubjectGroupEvent subjectGroupEvent, string userToken)
         {
             var user = GetUser(userToken, _repo);
-            var hasPermission = CheckEditPermissions(user.SubjectGroupsPermissions, subjectGroupEvent.ParentId);
+            var hasPermission = CheckAnyPermissions(user.SubjectGroupsPermissions, subjectGroupEvent.ParentId);
 
-            if (!hasPermission) FailOnAuth();
+            var groupId = _repo.GetSubjectGroupGroupId(subjectGroupEvent.Id);
+            var hasGroupPermission = CheckAnyPermissions(user.GroupsPermissions, groupId);
 
-            return _repo.EditEvent(subjectGroupEvent);
-        }
-
-        public ApiResponse DeleteGroupEvent(GroupEvent groupEvent, string userToken)
-        {
-            var user = GetUser(userToken, _repo);
-            var hasPermission = CheckEditPermissions(user.SubjectGroupsPermissions, groupEvent.ParentId);
-
-            if (!hasPermission) FailOnAuth();
-
-            return _repo.EditEvent(groupEvent);
-        }
-
-        public ApiResponse DeleteSubjectEvent(SubjectEvent subjectEvent, string userToken)
-        {
-            var user = GetUser(userToken, _repo);
-            var hasPermission = CheckEditPermissions(user.SubjectGroupsPermissions, _repo.GetSubjectParentId(subjectEvent.ParentId));
-
-            if (!hasPermission) FailOnAuth();
-
-            return _repo.EditEvent(subjectEvent);
-        }
-
-        public ApiResponse DeleteSubjectGroupEvent(SubjectGroupEvent subjectGroupEvent, string userToken)
-        {
-            var user = GetUser(userToken, _repo);
-            var hasPermission = CheckEditPermissions(user.SubjectGroupsPermissions, subjectGroupEvent.ParentId);
-
-            if (!hasPermission) FailOnAuth();
+            if (!hasPermission && !hasGroupPermission) FailOnAuth();
 
             return _repo.EditEvent(subjectGroupEvent);
+        }
+
+        public ApiResponse RemoveGroupEvent(GroupEvent groupEvent, string userToken)
+        {
+            var user = GetUser(userToken, _repo);
+            groupEvent.ParentId = _repo.GetEventParentId(groupEvent);
+
+            var hasPermission = CheckAnyPermissions(user.GroupsPermissions, groupEvent.ParentId);
+
+            if (!hasPermission) FailOnAuth();
+
+            return _repo.RemoveEvent(groupEvent);
+        }
+
+        public ApiResponse RemoveSubjectEvent(SubjectEvent subjectEvent, string userToken)
+        {
+            var user = GetUser(userToken, _repo);
+            subjectEvent.ParentId = _repo.GetEventParentId(subjectEvent);
+
+            var hasPermission = CheckAnyPermissions(user.GroupsPermissions, _repo.GetSubjectParentId(subjectEvent.ParentId));
+
+            if (!hasPermission) FailOnAuth();
+
+            return _repo.RemoveEvent(subjectEvent);
+        }
+
+        public ApiResponse RemoveSubjectGroupEvent(SubjectGroupEvent subjectGroupEvent, string userToken)
+        {
+            var user = GetUser(userToken, _repo);
+            subjectGroupEvent.ParentId = _repo.GetEventParentId(subjectGroupEvent);
+
+            var hasPermission = CheckAnyPermissions(user.SubjectGroupsPermissions, subjectGroupEvent.ParentId);
+
+            var groupId = _repo.GetSubjectGroupGroupId(subjectGroupEvent.Id);
+            var hasGroupPermission = CheckAnyPermissions(user.GroupsPermissions, groupId);
+
+            if (!hasPermission && !hasGroupPermission) FailOnAuth();
+
+            return _repo.RemoveEvent(subjectGroupEvent);
         }
     }
 }

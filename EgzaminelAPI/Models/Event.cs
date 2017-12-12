@@ -10,7 +10,7 @@ namespace EgzaminelAPI.Models
     public class Event
     {
         [DataMember(Order = 1)]
-        public int? Id { get; set; }
+        public int Id { get; set; }
 
         [DataMember(Order = 2)]
         public virtual Type EventType { get; private set; }
