@@ -1,6 +1,5 @@
 ﻿using EgzaminelAPI.Context;
 using EgzaminelAPI.Models;
-using EgzaminelAPI.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
@@ -11,8 +10,8 @@ namespace EgzaminelAPI.Helpers
     {
         Group GetGroup(int id);
         ICollection<Group> GetGroups();
-        ApiResponse AddGroup(string name, string desc, string password, int ownerId);
-        ApiResponse UpdateGroup(int id, string name, string desc, string password);
+        ApiResponse AddGroup(Group g);
+        ApiResponse UpdateGroup(int id, Group g);
         ApiResponse RemoveGroup(int id);
         IEnumerable<GroupEvent> GetGroupEvents(int id);
     }
@@ -49,34 +48,21 @@ namespace EgzaminelAPI.Helpers
 
         // GET api/groups/add
         [Authorize(Policy = "TokenValidation")]
+        [HttpPost]
         [Route("add")]
-        public ApiResponse AddGroup(string name, string desc, string password, int ownerId)
+        public ApiResponse AddGroup([FromBody]Group group)
         {
-            var group = new Group()
-            {
-                Name = name,
-                Description = desc,
-                Password = password,
-            };
-
             var token = this.GetAuthTokenFromHttpContext();
-
             return _groupsContext.AddGroup(group, token);
         }
 
         // GET api/groups/update/{id}
         [Authorize(Policy = "TokenValidation")]
+        [HttpPost]
         [Route("update/{id}")]
-        public ApiResponse UpdateGroup(int id, string name, string desc, string password)
+        public ApiResponse UpdateGroup(int id, [FromBody]Group group)
         {
-            var group = new Group()
-            {
-                Id = id,
-                Name = name,
-                Description = desc,
-                Password = password
-            };
-
+            group.Id = id;
             var token = this.GetAuthTokenFromHttpContext();
             return _groupsContext.EditGroup(group, token);
         }

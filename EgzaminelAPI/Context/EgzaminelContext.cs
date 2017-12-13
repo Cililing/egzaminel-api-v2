@@ -40,6 +40,11 @@ namespace EgzaminelAPI.Context
             throw new EgzaminelException();
         }
 
+        protected bool CheckAnyPermissions(IEnumerable<Permission> permission, int objectId)
+        {
+            return CheckEditPermissions(permission, objectId) || CheckAdminPermissions(permission, objectId);
+        }
+
         protected bool CheckEditPermissions(IEnumerable<Permission> permissions, int objectId)
         {
             var objectPermissions = permissions.Where(permission => permission.ObjectId == objectId);

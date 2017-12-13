@@ -41,7 +41,7 @@ namespace EgzaminelAPI.Context
             var hasSubjectGroupPermission = this.CheckEditPermissions(user.SubjectGroupsPermissions, subjectGroup.Id);
 
             var groupId = _repo.GetSubjectParentId(subjectGroup.ParentSubject.Id);
-            var hasGroupPermission = this.CheckEditPermissions(user.GroupsPermissions, groupId);
+            var hasGroupPermission = this.CheckAnyPermissions(user.GroupsPermissions, groupId);
             
             if (!hasSubjectGroupPermission && !hasGroupPermission)
             {
@@ -57,14 +57,14 @@ namespace EgzaminelAPI.Context
             var hasSubjectGroupPermission = this.CheckEditPermissions(user.SubjectGroupsPermissions, subjectGroup.Id);
 
             var groupId = _repo.GetSubjectGroupGroupId(subjectGroup.Id);
-            var hasGroupPermission = this.CheckEditPermissions(user.GroupsPermissions, groupId);
+            var hasGroupPermission = this.CheckAnyPermissions(user.GroupsPermissions, groupId);
 
             if (!hasSubjectGroupPermission && !hasGroupPermission)
             {
                 FailOnAuth();
             }
 
-            return _repo.DeleteSubjectGroup(subjectGroup);
+            return _repo.RemoveSubjectGroup(subjectGroup);
         }
 
         public ApiResponse EditSubjectGroup(SubjectGroup subjectGroup, string userToken)
@@ -73,7 +73,7 @@ namespace EgzaminelAPI.Context
             var hasSubjectGroupPermission = this.CheckEditPermissions(user.SubjectGroupsPermissions, subjectGroup.Id);
 
             var groupId = _repo.GetSubjectGroupGroupId(subjectGroup.Id);
-            var hasGroupPermission = this.CheckEditPermissions(user.GroupsPermissions, groupId);
+            var hasGroupPermission = this.CheckAnyPermissions(user.GroupsPermissions, groupId);
 
             if (!hasSubjectGroupPermission && !hasGroupPermission)
             {

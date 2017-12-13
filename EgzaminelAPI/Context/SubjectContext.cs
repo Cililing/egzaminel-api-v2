@@ -30,7 +30,7 @@ namespace EgzaminelAPI.Context
         public ApiResponse AddSubject(Subject subject, string userToken)
         {
             var user = GetUser(userToken, _repo);
-            var hasPermission = this.CheckEditPermissions(user.GroupsPermissions, subject.ParentGroup.Id);
+            var hasPermission = this.CheckAnyPermissions(user.GroupsPermissions, subject.ParentGroup.Id.Value);
 
             if (!hasPermission) FailOnAuth();
 
@@ -41,18 +41,18 @@ namespace EgzaminelAPI.Context
         {
             var user = GetUser(userToken, _repo);
             var groupId = _repo.GetSubjectParentId(subject.Id);
-            var hasPermission = this.CheckEditPermissions(user.GroupsPermissions, groupId);
+            var hasPermission = this.CheckAnyPermissions(user.GroupsPermissions, groupId);
 
             if (!hasPermission) FailOnAuth();
 
-            return _repo.DeleteSubject(subject);
+            return _repo.RemoveSubject(subject);
         }
 
         public ApiResponse EditSubject(Subject subject, string userToken)
         {
             var user = GetUser(userToken, _repo);
             var groupId = _repo.GetSubjectParentId(subject.Id);
-            var hasPermission = this.CheckEditPermissions(user.GroupsPermissions, groupId);
+            var hasPermission = this.CheckAnyPermissions(user.GroupsPermissions, groupId);
 
             if (!hasPermission) FailOnAuth();
 

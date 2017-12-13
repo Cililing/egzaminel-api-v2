@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using EgzaminelAPI.Models;
 using EgzaminelAPI.Context;
+using System;
+using Microsoft.AspNetCore.Authorization;
 
 namespace EgzaminelAPI.Helpers
 {
@@ -10,13 +12,13 @@ namespace EgzaminelAPI.Helpers
         SubjectEvent GetSubjectEvent(int id);
         SubjectGroupEvent GetSubjectGroupEvent(int id);
 
-        ApiResponse PostGroupEvent(int parentId, string name, string description, string place, string date);
-        ApiResponse PostSubjectEvent(int parentId, string name, string description, string place, string date);
-        ApiResponse PostSubjectGroupEvent(int parentId, string name, string description, string place, string date);
+        ApiResponse PostGroupEvent(int parentId, GroupEvent eventObject);
+        ApiResponse PostSubjectEvent(int parentId, SubjectEvent eventObject);
+        ApiResponse PostSubjectGroupEvent(int parentId, SubjectGroupEvent eventObject);
 
-        ApiResponse UpdateGroupEvent(int id, string name, string description, string place, string date);
-        ApiResponse UpdateSubjectEvent(int id, string name, string description, string place, string date);
-        ApiResponse UpdateSubjectGroupEvent(int id, string name, string description, string place, string date);
+        ApiResponse UpdateGroupEvent(int id, GroupEvent eventObject);
+        ApiResponse UpdateSubjectEvent(int id, SubjectEvent eventObject);
+        ApiResponse UpdateSubjectGroupEvent(int id, SubjectGroupEvent eventObject);
 
         ApiResponse DeleteGroupEvent(int id);
         ApiResponse DeleteSubjectEvent(int id);
@@ -56,174 +58,108 @@ namespace EgzaminelAPI.Helpers
         }
 
         // POST api/events/group/
+        [Authorize(Policy = "TokenValidation")]
         [Route("group")]
         [HttpPost]
-        public ApiResponse PostGroupEvent(
-            int parentId,
-            string name = "",
-            string description = "",
-            string place = "",
-            string date = "")
+        public ApiResponse PostGroupEvent(int parentId, [FromBody] GroupEvent eventObject)
         {
-            var userToken = this.GetAuthTokenFromHttpContext();
-            return _eventContext.PostGroupEvent(
-                new GroupEvent()
-                {
-                    Name = name,
-                    Description = description,
-                    Date = date.ConvertToDateTimeFromMySQLString(),
-                    Place = place,
-                    ParentId = parentId
-                }, userToken);
+            return PostEventObjectByType(parentId, eventObject);
         }
 
         // POST api/events/subject/
+        [Authorize(Policy = "TokenValidation")]
         [Route("subject")]
         [HttpPost]
-        public ApiResponse PostSubjectEvent(
-            int parentId,
-            string name = "",
-            string description = "",
-            string place = "",
-            string date = "")
+        public ApiResponse PostSubjectEvent(int parentId, [FromBody] SubjectEvent eventObject)
         {
-            var userToken = this.GetAuthTokenFromHttpContext();
-            return _eventContext.PostSubjectEvent(
-                new SubjectEvent()
-                {
-                    Name = name,
-                    Description = description,
-                    Date = date.ConvertToDateTimeFromMySQLString(),
-                    Place = place,
-                    ParentId = parentId
-                }, userToken);
+            return PostEventObjectByType(parentId, eventObject);
         }
 
         // POST api/events/subjectGroup/
+        [Authorize(Policy = "TokenValidation")]
         [Route("subjectGroup")]
         [HttpPost]
-        public ApiResponse PostSubjectGroupEvent(
-            int parentId, 
-            string name = "",
-            string description = "",
-            string place = "",
-            string date = "")
+        public ApiResponse PostSubjectGroupEvent(int parentId, [FromBody] SubjectGroupEvent eventObject)
         {
-            var userToken = this.GetAuthTokenFromHttpContext();
-            return _eventContext.PostSubjectGroupEvent(
-                new SubjectGroupEvent()
-                {
-                    Name = name,
-                    Description = description,
-                    Date = date.ConvertToDateTimeFromMySQLString(),
-                    Place = place,
-                    ParentId = parentId
-                }, userToken);
+            return PostEventObjectByType(parentId, eventObject);
         }
 
+        [Authorize(Policy = "TokenValidation")]
         [Route("group/{id}")]
         [HttpPut]
-        public ApiResponse UpdateGroupEvent(
-            int id,
-            string name,
-            string description,
-            string place,
-            string date)
+        public ApiResponse UpdateGroupEvent(int id, [FromBody] GroupEvent eventObject)
         {
-            var eventObj = _eventContext.GetGroupEvent(id);
-            if (eventObj == null)
-            {
-                return new ApiResponse
-                {
-                    IsSuccess = false,
-                    ResultCode = -1
-                };
-            }
-            var userToken = this.GetAuthTokenFromHttpContext();
-            ControllerUtils.UpdateIfNotNull(id, () => eventObj.Name = name);
-            ControllerUtils.UpdateIfNotNull(description, () => eventObj.Description = description);
-            ControllerUtils.UpdateIfNotNull(place, () => eventObj.Place = place);
-            ControllerUtils.UpdateIfNotNull(date, () => eventObj.Date = date.ConvertToDateTimeFromMySQLString());
-
-            return _eventContext.UpdateGroupEvent(eventObj, userToken);
+            return UpdateEventObjectByType(id, eventObject);
         }
 
+        [Authorize(Policy = "TokenValidation")]
         [Route("subject/{id}")]
         [HttpPut]
-        public ApiResponse UpdateSubjectEvent(
-            int id,
-            string name,
-            string description,
-            string place,
-            string date)
+        public ApiResponse UpdateSubjectEvent(int id, [FromBody] SubjectEvent eventObject)
         {
-            var userToken = this.GetAuthTokenFromHttpContext();
-            var eventObj = _eventContext.GetSubjectEvent(id);
-            if (eventObj == null)
-            {
-                return new ApiResponse
-                {
-                    IsSuccess = false,
-                    ResultCode = -1
-                };
-            }
-            ControllerUtils.UpdateIfNotNull(id, () => eventObj.Name = name);
-            ControllerUtils.UpdateIfNotNull(description, () => eventObj.Description = description);
-            ControllerUtils.UpdateIfNotNull(place, () => eventObj.Place = place);
-            ControllerUtils.UpdateIfNotNull(date, () => eventObj.Date = date.ConvertToDateTimeFromMySQLString());
-
-            return _eventContext.UpdateSubjectEvent(eventObj, userToken);
+            return UpdateEventObjectByType(id, eventObject);
         }
 
+        [Authorize(Policy = "TokenValidation")]
         [Route("subjectGroup/{id}")]
         [HttpPut]
-        public ApiResponse UpdateSubjectGroupEvent(
-            int id,
-            string name,
-            string description,
-            string place,
-            string date)
+        public ApiResponse UpdateSubjectGroupEvent(int id, [FromBody] SubjectGroupEvent eventObject)
         {
-            var userToken = this.GetAuthTokenFromHttpContext();
-            var eventObj = _eventContext.GetSubjectGroupEvent(id);
-            if (eventObj == null)
-            {
-                return new ApiResponse
-                {
-                    IsSuccess = false,
-                    ResultCode = -1
-                };
-            }
-            ControllerUtils.UpdateIfNotNull(id, () => eventObj.Name = name);
-            ControllerUtils.UpdateIfNotNull(description, () => eventObj.Description = description);
-            ControllerUtils.UpdateIfNotNull(place, () => eventObj.Place = place);
-            ControllerUtils.UpdateIfNotNull(date, () => eventObj.Date = date.ConvertToDateTimeFromMySQLString());
-
-            return _eventContext.UpdateSubjectGroupEvent(eventObj, userToken);
+            return UpdateEventObjectByType(id, eventObject);
         }
 
+        [Authorize(Policy = "TokenValidation")]
         [Route("group/{id}")]
         [HttpDelete]
         public ApiResponse DeleteGroupEvent(int id)
         {
-            var userToken = this.GetAuthTokenFromHttpContext();
-            return _eventContext.DeleteGroupEvent(new GroupEvent() { Id = id }, userToken);
+            return DeleteEventObjectByType(id, new GroupEvent() { Id = id });
         }
 
+        [Authorize(Policy = "TokenValidation")]
         [Route("subject/{id}")]
         [HttpDelete]
         public ApiResponse DeleteSubjectEvent(int id)
         {
-            var userToken = this.GetAuthTokenFromHttpContext();
-            return _eventContext.DeleteSubjectEvent(new SubjectEvent() { Id = id }, userToken);
+            return DeleteEventObjectByType(id, new SubjectEvent() { Id = id });
         }
 
+        [Authorize(Policy = "TokenValidation")]
         [Route("subjectGroup/{id}")]
         [HttpDelete]
         public ApiResponse DeleteSubjectGroupEvent(int id)
         {
+            return DeleteEventObjectByType(id, new SubjectGroupEvent() { Id = id });
+        }
+
+        private ApiResponse PostEventObjectByType(int parentId, Event eventObject)
+        {
             var userToken = this.GetAuthTokenFromHttpContext();
-            return _eventContext.DeleteSubjectGroupEvent(new SubjectGroupEvent() { Id = id }, userToken);
+            eventObject.ParentId = parentId;
+            return DAOUtils.DoByEventType<ApiResponse>(eventObject,
+                () => _eventContext.PostGroupEvent(eventObject as GroupEvent, userToken),
+                () => _eventContext.PostSubjectEvent(eventObject as SubjectEvent, userToken),
+                () => _eventContext.PostSubjectGroupEvent(eventObject as SubjectGroupEvent, userToken));
+        }
+
+        private ApiResponse UpdateEventObjectByType(int id, Event eventObject)
+        {
+            var userToken = this.GetAuthTokenFromHttpContext();
+            eventObject.Id = id;
+            return DAOUtils.DoByEventType<ApiResponse>(eventObject,
+                () => _eventContext.UpdateGroupEvent(eventObject as GroupEvent, userToken),
+                () => _eventContext.UpdateSubjectEvent(eventObject as SubjectEvent, userToken),
+                () => _eventContext.UpdateSubjectGroupEvent(eventObject as SubjectGroupEvent, userToken));
+        }
+
+        private ApiResponse DeleteEventObjectByType(int id, Event eventObject)
+        {
+            var userToken = this.GetAuthTokenFromHttpContext();
+            eventObject.Id = id;
+            return DAOUtils.DoByEventType<ApiResponse>(eventObject,
+                () => _eventContext.RemoveGroupEvent(eventObject as GroupEvent, userToken),
+                () => _eventContext.RemoveSubjectEvent(eventObject as SubjectEvent, userToken),
+                () => _eventContext.RemoveSubjectGroupEvent(eventObject as SubjectGroupEvent, userToken));
         }
     }
 }

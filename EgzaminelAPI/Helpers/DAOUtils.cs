@@ -1,9 +1,6 @@
 ﻿using EgzaminelAPI.Models;
-using EgzaminelAPI.Models;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace EgzaminelAPI.Helpers
 {

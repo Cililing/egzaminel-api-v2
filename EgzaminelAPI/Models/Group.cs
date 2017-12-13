@@ -1,7 +1,5 @@
-﻿using EgzaminelAPI.Models;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.Serialization;
 
 namespace EgzaminelAPI.Models
@@ -10,7 +8,7 @@ namespace EgzaminelAPI.Models
     public class Group
     {
         [DataMember(Order = 1)]
-        public int Id { get; set; }
+        public int? Id { get; set; }
 
         [DataMember(Order = 2)]
         public string Name { get; set; }
@@ -30,7 +28,7 @@ namespace EgzaminelAPI.Models
         [DataMember(Order = 8)]
         public ICollection<Subject> Subjects { get; set; }
 
-        [IgnoreDataMember]
+        [DataMember(Order = 9)]
         public string Password { get; set; }
     }
 }

@@ -15,8 +15,8 @@ namespace EgzaminelAPI.DataAccess
         TokenModel GetToken(string token);
         bool SaveToken(TokenModel token);
         bool UpdateToken(TokenModel token);
-        bool DeleteToken(string token);
-        bool DeleteTokenByUserId(int userId);
+        bool RemoveToken(string token);
+        bool RemoveToken(int userId);
 
         // TODO implement section
         // Users
@@ -25,19 +25,19 @@ namespace EgzaminelAPI.DataAccess
         ICollection<User> GetUsers(IEnumerable<int> ids);
         ApiResponse AddUser(User user);
         ApiResponse EditUser(User user);
-        ApiResponse DeleteUser(User user);
+        ApiResponse RemoveUser(User user);
         IEnumerable<GroupPermission> GetGroupPermission(int userId);
         IEnumerable<SubjectGroupPermission> GetSubjectGroupPermission(int userId);
         ApiResponse CreartePermission(Permission permission);
         ApiResponse EditPermission(Permission permission);
-        ApiResponse DeletePermission(Permission permission);
+        ApiResponse RemovePermission(Permission permission);
 
         // Groups
         Group GetGroup(int id);
         ICollection<Group> GetGroups(User user);
         ApiResponse AddGroup(Group group, int ownerId);
         ApiResponse EditGroup(Group group);
-        ApiResponse DeleteGroup(Group group);
+        ApiResponse RemoveGroup(Group group);
 
         // Subject
         int GetSubjectParentId(int subjectId);
@@ -45,18 +45,18 @@ namespace EgzaminelAPI.DataAccess
         ICollection<Subject> GetSubjects(int parentId);
         ApiResponse AddSubject(Subject subject);
         ApiResponse EditSubject(Subject subject);
-        ApiResponse DeleteSubject(Subject subject);
+        ApiResponse RemoveSubject(Subject subject);
 
-        // TODO implement section
         // Subject groups
         int GetSubjectGroupGroupId(int subjectGroupId);
         SubjectGroup GetSubjectGroup(int id);
-        ICollection<SubjectGroup> GetSubjectGroups(int parentId); // implemented
+        ICollection<SubjectGroup> GetSubjectGroups(int parentId);
         ApiResponse AddSubjectGroup(SubjectGroup subjectGroup);
         ApiResponse EditSubjectGroup(SubjectGroup subjectGroup);
-        ApiResponse DeleteSubjectGroup(SubjectGroup subjectGroup);
+        ApiResponse RemoveSubjectGroup(SubjectGroup subjectGroup);
 
         // Events
+        int GetEventParentId(Event eventObject);
         GroupEvent GetGroupEvent(int id);
         SubjectEvent GetSubjectEvent(int id);
         SubjectGroupEvent GetSubjectGroupEvent(int id);
@@ -65,7 +65,7 @@ namespace EgzaminelAPI.DataAccess
         ICollection<SubjectGroupEvent> GetSubjectGroupEvents(int parentId);
         ApiResponse AddEvent(Event eventObject);
         ApiResponse EditEvent(Event eventObject);
-        ApiResponse DeleteEvent(Event eventObject);
+        ApiResponse RemoveEvent(Event eventObject);
     }
 
     public class Repo : IRepo
@@ -81,6 +81,13 @@ namespace EgzaminelAPI.DataAccess
 
         #region TOKEN
 
+        /// <summary>
+        ///     Returns TokenModel by token 
+        /// </summary>
+        /// <param name="token">user token</param>
+        /// <returns>
+        ///     TokenModel Object
+        /// </returns>
         public TokenModel GetToken(string token)
         {
             var query = String.Format(@"SELECT * FROM users_token WHERE auth_token = '{0}'", token);
@@ -89,6 +96,13 @@ namespace EgzaminelAPI.DataAccess
             return result;
         }
 
+        /// <summary>
+        ///     Saves token in database
+        /// </summary>
+        /// <param name="token">TokenModel object</param>
+        /// <returns>
+        ///     True if saved, otherwise false
+        /// </returns>
         public bool SaveToken(TokenModel token)
         {
             var query = String.Format(
@@ -103,6 +117,13 @@ namespace EgzaminelAPI.DataAccess
             return EditItem(query, (code) => code > 0);
         }
 
+        /// <summary>
+        ///     Updates Token in database.
+        /// </summary>
+        /// <param name="token">TokenModel object</param>
+        /// <returns>
+        ///     True if updated, otherwise false
+        /// </returns>
         public bool UpdateToken(TokenModel token)
         {
             var query = String.Format(
@@ -114,7 +135,14 @@ namespace EgzaminelAPI.DataAccess
             return EditItem(query, (code) => code > 0);
         }
 
-        public bool DeleteToken(string token)
+        /// <summary>
+        ///     Removes Token by user token
+        /// </summary>
+        /// <param name="token">User token</param>
+        /// <returns>
+        ///     True if removed, otherwise false
+        /// </returns>
+        public bool RemoveToken(string token)
         {
             var query = String.Format(
                 @"DELETE FROM users_token WHERE `auth_token` = {1}",
@@ -123,7 +151,14 @@ namespace EgzaminelAPI.DataAccess
             return EditItem(query, (code) => code > 0);
         }
 
-        public bool DeleteTokenByUserId(int userId)
+        /// <summary>
+        ///     Removes Token by userId
+        /// </summary>
+        /// <param name="userId">userId</param>
+        /// <returns>
+        ///     True if removed, otherwise false
+        /// </returns>
+        public bool RemoveToken(int userId)
         {
             var query = String.Format(
                 @"DELETE FROM users_token WHERE `user_id` = {1}",
@@ -135,7 +170,12 @@ namespace EgzaminelAPI.DataAccess
         #endregion
 
         #region USERS
-
+        /// <summary>
+        ///     Returns user id
+        /// </summary>
+        /// <param name="username"></param>
+        /// <param name="password"></param>
+        /// <returns></returns>
         public int? GetUserId(string username, string password)
         {
             var query = String.Format(@"SELECT id FROM users WHERE username = '{0}' AND password = '{1}'", username, password);
@@ -158,6 +198,11 @@ namespace EgzaminelAPI.DataAccess
             return result;
         }
 
+        /// <summary>
+        ///     Returns collection of users by theri ids
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
         public ICollection<User> GetUsers(IEnumerable<int> ids)
         {
             var queryIds = string.Join(",", ids.ToArray());
@@ -166,6 +211,11 @@ namespace EgzaminelAPI.DataAccess
             return GetCollection(query, (reader) => _mapper.MapUsers(reader));
         }
 
+        /// <summary>
+        ///     Returns collection of user permissions
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <returns></returns>
         public IEnumerable<GroupPermission> GetGroupPermission(int userId)
         {
             var query = String.Format(@"SELECT * FROM groups_permissions WHERE user_id = '{0}'", userId);
@@ -215,7 +265,7 @@ namespace EgzaminelAPI.DataAccess
             });
         }
 
-        public ApiResponse DeletePermission(Permission permission)
+        public ApiResponse RemovePermission(Permission permission)
         {
             var tableName = GetPermissionTableName(permission);
             var query = String.Format(@"DELETE FROM `{0}` WHERE `{0}.`user_id` = {1} AND `{0}.`object_id` = {2}",
@@ -245,9 +295,9 @@ namespace EgzaminelAPI.DataAccess
             }
 
             var groupId = result.Id;
-            var events = GetGroupEvents(groupId);
+            var events = GetGroupEvents(groupId.Value);
             result.Events = events;
-            result.Subjects = GetSubjects(groupId);
+            result.Subjects = GetSubjects(groupId.Value);
 
             return result;
         }
@@ -266,9 +316,9 @@ namespace EgzaminelAPI.DataAccess
             ForEach(result, (group) =>
             {
                 var groupId = group.Id;
-                var events = GetGroupEvents(groupId);
+                var events = GetGroupEvents(groupId.Value);
                 group.Events = events;
-                group.Subjects = GetSubjects(groupId);
+                group.Subjects = GetSubjects(groupId.Value);
             });
 
             return result;
@@ -307,7 +357,7 @@ namespace EgzaminelAPI.DataAccess
             });
         }
 
-        public ApiResponse DeleteGroup(Group group)
+        public ApiResponse RemoveGroup(Group group)
         {
             var query = String.Format(@"DELETE FROM groups WHERE groups.`id` = {0}", group.Id);
 
@@ -379,7 +429,7 @@ namespace EgzaminelAPI.DataAccess
                 VALUES (NULL, '{0}', '{1}', '{2}', NULL); SELECT LAST_INSERT_ID()",
                 PutSafeValue(subject.Name, (x) => x.ToString()),
                 PutSafeValue(subject.Description, (x) => x.ToString()),
-                PutSafeValue(subject.ParentGroup, (x) => x.ToString()));
+                PutSafeValue(subject.ParentGroup.Id, (x) => x.ToString()));
 
             return AddItem(query, (id) => new ApiResponse()
             {
@@ -403,7 +453,7 @@ namespace EgzaminelAPI.DataAccess
             });
         }
 
-        public ApiResponse DeleteSubject(Subject subject)
+        public ApiResponse RemoveSubject(Subject subject)
         {
             var query = String.Format(@"DELETE FROM subjects WHERE subjects.id = {0}", subject.Id);
 
@@ -470,7 +520,7 @@ namespace EgzaminelAPI.DataAccess
             });
         }
 
-        public ApiResponse DeleteSubjectGroup(SubjectGroup subjectGroup)
+        public ApiResponse RemoveSubjectGroup(SubjectGroup subjectGroup)
         {
             var query = String.Format(@"DELETE FROM subject_groups WHERE id = {0}", subjectGroup.Id);
 
@@ -501,6 +551,21 @@ namespace EgzaminelAPI.DataAccess
 
         #region EVENTS
 
+        public int GetEventParentId(Event eventObject)
+        {
+            var tableName = GetEventTableName(eventObject);
+            var query = String.Format(@"SELECT parent_id FROM {0} WHERE id = {1}", tableName, eventObject.Id);
+
+            var result = GetItem(query, (reader) => _mapper.MapEventParentId(reader));
+
+            return result == null ? -1 : result.Value;
+        }
+
+       /// <summary>
+       ///  Returns groupEvent object
+       /// </summary>
+       /// <param name="id">GroupEvent id</param>
+       /// <returns></returns>
         public GroupEvent GetGroupEvent(int id)
         {
             var query = String.Format(@"SELECT * FROM events_groups WHERE id = {0}", id);
@@ -509,17 +574,21 @@ namespace EgzaminelAPI.DataAccess
 
         public SubjectEvent GetSubjectEvent(int id)
         {
-            var query = String.Format(@"SELECT * FROM events_groups WHERE id = {0}", id);
+            var query = String.Format(@"SELECT * FROM events_subjects WHERE id = {0}", id);
             return GetItem(query, (reader) => _mapper.MapSubjectEvent(reader));
         }
 
         public SubjectGroupEvent GetSubjectGroupEvent(int id)
         {
-            var query = String.Format(@"SELECT * FROM events_groups WHERE id = {0}", id);
+            var query = String.Format(@"SELECT * FROM events_subjects_groups WHERE id = {0}", id);
             return GetItem(query, (reader) => _mapper.MapSubjectGroupEvent(reader));
         }
 
-
+        /// <summary>
+        ///     Returns groupEvents Collection
+        /// </summary>
+        /// <param name="parentId">GroupId</param>
+        /// <returns></returns>
         public ICollection<GroupEvent> GetGroupEvents(int parentId)
         {
             var query = String.Format(@"SELECT * FROM events_groups WHERE parent_id = {0}", parentId);
@@ -582,7 +651,7 @@ namespace EgzaminelAPI.DataAccess
             });
         }
 
-        public ApiResponse DeleteEvent(Event eventObject)
+        public ApiResponse RemoveEvent(Event eventObject)
         {
             string tableName = GetEventTableName(eventObject);
 
@@ -602,7 +671,13 @@ namespace EgzaminelAPI.DataAccess
         #endregion
 
         #region HELPERS        
-
+        /// <summary>
+        ///     Returns null-safe value (val can be inserted safly to database)
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="value">Value</param>
+        /// <param name="mapper">Mapper - ex. eventObject.Place, (x) => x.ToString()</param>
+        /// <returns></returns>
         private string PutSafeValue<T>(T value, Func<T, string> mapper)
         {
             if (value == null || value.ToString() == "")
@@ -616,11 +691,21 @@ namespace EgzaminelAPI.DataAccess
             }
         }
 
+        /// <summary>
+        ///     Convert date to string wich can be safly put into db
+        /// </summary>
+        /// <param name="dateTime"></param>
+        /// <returns></returns>
         private string ConvertDate(DateTime? dateTime)
         {
             return dateTime == null ? "NULL" : "'" + dateTime?.ToString("yyyy-MM-dd HH:mm:ss") + "'";
         }
 
+        /// <summary>
+        ///     Return eventTabble name - can be used for every type of events
+        /// </summary>
+        /// <param name="eventObject">event instance</param>
+        /// <returns></returns>
         private string GetEventTableName(Event eventObject)
         {
             return DAOUtils.DoByEventType<string>(eventObject,
@@ -636,6 +721,15 @@ namespace EgzaminelAPI.DataAccess
                 () => "subject_groups_permissions");
         }
 
+        /// <summary>
+        ///     Method open databaase and execute "INSERT INTO ..." Sql Command
+        /// </summary>
+        /// <typeparam name="T">mapper output</typeparam>
+        /// <param name="sqlQuery">full sql query</param>
+        /// <param name="mapper">Mapper for result (input: id of inserted item)</param>
+        /// <returns>
+        ///     Result of mapper
+        /// </returns>
         private T AddItem<T>(string sqlQuery, Func<int, T> mapper)
         {
             using (MySqlConnection conn = _respositoryContext.GetConnection())
@@ -647,6 +741,13 @@ namespace EgzaminelAPI.DataAccess
             }
         }
 
+        /// <summary>
+        ///     Opens database and edit item ("UPDATE")
+        /// </summary>
+        /// <typeparam name="T">mapper output</typeparam>
+        /// <param name="sqlQuery">full sql squery </param>
+        /// <param name="mapper">mapper (input: number of edited items)</param>
+        /// <returns></returns>
         private T EditItem<T>(string sqlQuery, Func<int, T> mapper)
         {
             using (MySqlConnection conn = _respositoryContext.GetConnection())
@@ -658,6 +759,13 @@ namespace EgzaminelAPI.DataAccess
             }
         }
 
+        /// <summary>
+        ///     Returns single item from database ("SELECT")
+        /// </summary>
+        /// <typeparam name="T">mapper output</typeparam>
+        /// <param name="sqlQuery">sqlQuery</param>
+        /// <param name="mapper">mapper: (input: MySqlDataReader object executing sqlQuery)</param>
+        /// <returns></returns>
         private T GetItem<T>(string sqlQuery, Func<MySqlDataReader, T> mapper)
         {
             using (MySqlConnection conn = _respositoryContext.GetConnection())
@@ -677,6 +785,14 @@ namespace EgzaminelAPI.DataAccess
             }
         }
 
+
+        /// <summary>
+        ///     Returns collection of items ("SELECT")
+        /// </summary>
+        /// <typeparam name="T">Type of items in output mapper collection</typeparam>
+        /// <param name="sqlQuery">sql query</param>
+        /// <param name="mapper">mapper: (input: MySqlDataReader object executing sqlQuery)</param>
+        /// <returns></returns>
         private ICollection<T> GetCollection<T>(string sqlQuery, Func<MySqlDataReader, ICollection<T>> mapper)
         {
             using (MySqlConnection conn = _respositoryContext.GetConnection())
@@ -690,6 +806,13 @@ namespace EgzaminelAPI.DataAccess
             }
         }
 
+        /// <summary>
+        ///     Returns enumerable list of items ("SELECT")
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="sqlQuery">sql query</param>
+        /// <param name="mapper">mapper (input: MySqlDataReader object executing sqlQuery)</param>
+        /// <returns></returns>
         private IEnumerable<T> GetList<T>(string sqlQuery, Func<MySqlDataReader, IEnumerable<T>> mapper)
         {
             using (MySqlConnection conn = _respositoryContext.GetConnection())
@@ -703,6 +826,12 @@ namespace EgzaminelAPI.DataAccess
             }
         }
 
+        /// <summary>
+        ///  Simple ForEach function
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="items"></param>
+        /// <param name="action"></param>
         private void ForEach<T>(ICollection<T> items, Action<T> action)
         {
             foreach (var item in items)
@@ -725,7 +854,7 @@ namespace EgzaminelAPI.DataAccess
             throw new NotImplementedException();
         }
 
-        public ApiResponse DeleteUser(User user)
+        public ApiResponse RemoveUser(User user)
         {
             throw new NotImplementedException();
         }

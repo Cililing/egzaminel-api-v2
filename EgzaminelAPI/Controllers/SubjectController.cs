@@ -12,8 +12,8 @@ namespace EgzaminelAPI.Controllers
     {
         Subject GetSubject (int id);
         ICollection<Subject> GetSubjects(int parentId);
-        ApiResponse AddSubject(string name, string desc, int groupId);
-        ApiResponse UpdateSubject(int id, string name, string desc);
+        ApiResponse AddSubject(int groupId, Subject subject);
+        ApiResponse UpdateSubject(int id, Subject subject);
         ApiResponse RemoveSubject(int id);
         IEnumerable<SubjectEvent> GetSubjectEvents(int id);
     }
@@ -43,32 +43,22 @@ namespace EgzaminelAPI.Controllers
         }
 
         [Authorize(Policy = "TokenValidation")]
-        [Route("add")]
-        public ApiResponse AddSubject(string name, string desc, int groupId)
+        [HttpPost]
+        [Route("add/{groupId}")]
+        public ApiResponse AddSubject(int groupId, [FromBody]Subject subject)
         {
             var userToken = this.GetAuthTokenFromHttpContext();
-            var subject = new Subject()
-            {
-                Name = name,
-                Description = desc,
-                ParentGroup = new Group() { Id = groupId }
-            };
-
+            subject.ParentGroup = new Group { Id = groupId };
             return _subjectContext.AddSubject(subject, userToken);
         }
 
         [Authorize(Policy = "TokenValidation")]
+        [HttpPost]
         [Route("update/{id}")]
-        public ApiResponse UpdateSubject(int id, string name, string desc)
+        public ApiResponse UpdateSubject(int id, [FromBody]Subject subject)
         {
             var userToken = this.GetAuthTokenFromHttpContext();
-            var subject = new Subject()
-            {
-                Id = id,
-                Name = name,
-                Description = desc
-            };
-
+            subject.Id = id;
             return _subjectContext.EditSubject(subject, userToken);
         }
 
