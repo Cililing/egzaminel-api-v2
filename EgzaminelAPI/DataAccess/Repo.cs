@@ -50,7 +50,7 @@ namespace EgzaminelAPI.DataAccess
         // Subject groups
         int GetSubjectGroupGroupId(int subjectGroupId);
         SubjectGroup GetSubjectGroup(int id);
-        ICollection<SubjectGroup> GetSubjectGroups(int parentId); // implemented
+        ICollection<SubjectGroup> GetSubjectGroups(int parentId);
         ApiResponse AddSubjectGroup(SubjectGroup subjectGroup);
         ApiResponse EditSubjectGroup(SubjectGroup subjectGroup);
         ApiResponse RemoveSubjectGroup(SubjectGroup subjectGroup);
