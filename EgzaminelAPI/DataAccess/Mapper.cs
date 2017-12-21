@@ -10,6 +10,7 @@ namespace EgzaminelAPI.DataAccess
     {
         TokenModel MapToken(MySqlDataReader reader);
         int? MapUserId(MySqlDataReader reader);
+        UserCredentials MapUserCredentials(MySqlDataReader reader);
         User MapUser(MySqlDataReader reader);
         ICollection<User> MapUsers(MySqlDataReader reader);
         int? MapSubjectParentId(MySqlDataReader reader);
@@ -122,6 +123,22 @@ namespace EgzaminelAPI.DataAccess
             if (reader.HasRows)
             {
                 return GetSafeValue(reader, "parent_id", () => reader.GetInt32("parent_id"));
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        public UserCredentials MapUserCredentials(MySqlDataReader reader)
+        {
+            if (reader.HasRows)
+            {
+                return new UserCredentials()
+                {
+                    HashedPassword = GetSafeValue(reader, "password", () => reader["password"].ToString()),
+                    Salt = GetSafeValue(reader, "salt", () => reader["salt"].ToString())
+                };
             }
             else
             {

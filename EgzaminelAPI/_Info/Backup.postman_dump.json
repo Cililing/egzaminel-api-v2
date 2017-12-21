@@ -6,7 +6,8 @@
 			"name": "Users",
 			"description": "",
 			"order": [
-				"0af1ff70-c979-cd17-7481-a0803f8205dd"
+				"0af1ff70-c979-cd17-7481-a0803f8205dd",
+				"af790a8c-54d2-cf7e-8b07-f385b4ee5769"
 			],
 			"folders": [],
 			"folders_order": [],
@@ -20,7 +21,7 @@
 			"remoteLinkUpdatedAt": null,
 			"public": false,
 			"createdAt": 1511642038636,
-			"updatedAt": 1512039461550,
+			"updatedAt": 1513775374106,
 			"write": true,
 			"published": false,
 			"favorite": true,
@@ -31,18 +32,18 @@
 					"id": "0af1ff70-c979-cd17-7481-a0803f8205dd",
 					"headers": "",
 					"headerData": [],
-					"url": "{{prefix}}/api/users/login?username=admin&password=qwerty",
+					"url": "{{prefix}}/api/users/login?username=postmantest1&password=haslow1234",
 					"queryParams": [
 						{
 							"key": "username",
-							"value": "admin",
+							"value": "postmantest1",
 							"equals": true,
 							"description": "",
 							"enabled": true
 						},
 						{
 							"key": "password",
-							"value": "qwerty",
+							"value": "haslow1234",
 							"equals": true,
 							"description": "",
 							"enabled": true
@@ -58,11 +59,41 @@
 					"tests": "var token = responseHeaders[\"Authorization\"];\npm.environment.set(\"auth_token\", token);\nconsole.log(token);",
 					"currentHelper": "normal",
 					"helperAttributes": {},
-					"time": 1512042162432,
-					"name": "login",
+					"time": 1513775396215,
+					"name": "/api/users/login",
 					"description": "",
 					"collectionId": "82270364-afd5-4f7b-ed98-d3645f7da50c",
 					"responses": []
+				},
+				{
+					"id": "af790a8c-54d2-cf7e-8b07-f385b4ee5769",
+					"headers": "Content-Type: application/json\n",
+					"headerData": [
+						{
+							"key": "Content-Type",
+							"value": "application/json",
+							"description": "",
+							"enabled": true
+						}
+					],
+					"url": "{{prefix}}/api/users/register",
+					"queryParams": [],
+					"pathVariables": {},
+					"pathVariableData": [],
+					"preRequestScript": null,
+					"method": "POST",
+					"collectionId": "82270364-afd5-4f7b-ed98-d3645f7da50c",
+					"data": "{\n\t\"username\": \"postmantest1\",\n\t\"email\": \"test@test.pl\",\n\t\"encryptedPassword\": \"haslow123\"\n}",
+					"dataMode": "raw",
+					"name": "/api/users/register",
+					"description": "",
+					"descriptionFormat": "html",
+					"time": 1513775374027,
+					"version": 2,
+					"responses": [],
+					"tests": null,
+					"currentHelper": "normal",
+					"helperAttributes": {}
 				}
 			]
 		},
@@ -4141,16 +4172,10 @@
 					"key": "prefix",
 					"value": "http://localhost:18779/",
 					"type": "text"
-				},
-				{
-					"enabled": true,
-					"key": "auth_token",
-					"value": "9c6d46b4-9b23-4cc1-829f-34ef91195fea",
-					"type": "text"
 				}
 			],
 			"team": null,
-			"timestamp": 1513121428455
+			"timestamp": 1513724404201
 		}
 	],
 	"headerPresets": [],

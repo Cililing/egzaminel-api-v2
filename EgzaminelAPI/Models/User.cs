@@ -24,11 +24,13 @@ namespace EgzaminelAPI.Models
         [DataMember(Order = 5)]
         public IEnumerable<SubjectGroupPermission> SubjectGroupsPermissions { get; set; }
 
-        [IgnoreDataMember]
-        public string Salt { get; set; }
+        [DataMember(Order = 6)]
+        public string EncryptedPassword { get; set; }
 
-        [IgnoreDataMember]
+        [DataMember(Order = 7)]
         public string Email { get; set; }
 
+        [IgnoreDataMember]
+        public string Salt { get; set; }
     }
 }

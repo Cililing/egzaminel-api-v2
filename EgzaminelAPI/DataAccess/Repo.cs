@@ -21,6 +21,7 @@ namespace EgzaminelAPI.DataAccess
         // TODO implement section
         // Users
         int? GetUserId(string username, string password);
+        UserCredentials GetUserCredentials(string username);
         User GetUser(int id);
         ICollection<User> GetUsers(IEnumerable<int> ids);
         ApiResponse AddUser(User user);
@@ -184,6 +185,14 @@ namespace EgzaminelAPI.DataAccess
             return result;
         }
 
+        public UserCredentials GetUserCredentials(string username)
+        {
+            var query = String.Format(@"SELECT password, salt FROM users WHERE username = '{0}'", username);
+            var result = GetItem(query, (reader) => _mapper.MapUserCredentials(reader));
+
+            return result;
+        }
+
         public User GetUser(int id)
         {
             var query = String.Format(@"SELECT * FROM users WHERE id = '{0}'", id);
@@ -209,6 +218,62 @@ namespace EgzaminelAPI.DataAccess
             var query = String.Format(@"SELECT * FROM users WHERE id IN ({0})", queryIds);
 
             return GetCollection(query, (reader) => _mapper.MapUsers(reader));
+        }
+
+        public ApiResponse AddUser(User user)
+        {
+            var query = String.Format(
+                @"INSERT INTO `users` (`id`, `username`, `password`, `salt`, `email`, `last_update`)
+                VALUES (NULL, '{0}', '{1}', '{2}', '{3}', NULL); SELECT LAST_INSERT_ID()",
+                PutSafeValue(user.Username, (x) => x.ToString()),
+                PutSafeValue(user.EncryptedPassword, (x) => x.ToString()),
+                PutSafeValue(user.Salt, (x) => x.ToString()),
+                PutSafeValue(user.Email, (x) => x.ToString()));
+
+            return AddItem(query, (id) => new ApiResponse()
+            {
+                IsSuccess = id >= 0,
+                ResultCode = id
+            });
+        }
+
+        public ApiResponse ChangePassword(User user)
+        {
+            var query = String.Format(
+            @"UPDATE groups SET `password` = '{0}', `salt` = '{1} WHERE `users`.`id` = {2}",
+            PutSafeValue(user.EncryptedPassword, (x) => x.ToString()),
+            PutSafeValue(user.Salt, (x) => x.ToString()));
+
+            return EditItem(query, (code) => new ApiResponse()
+            {
+                IsSuccess = code > 0,
+                ResultCode = code
+            });
+        }
+
+        public ApiResponse EditUser(User user)
+        {
+            var query = String.Format(
+            @"UPDATE groups SET `email` = '{0}' WHERE `users`.`id` = {1}",
+            PutSafeValue(user.Email, (x) => x.ToString()),
+            PutSafeValue(user.Id, (x) => x.ToString()));
+
+            return EditItem(query, (code) => new ApiResponse()
+            {
+                IsSuccess = code > 0,
+                ResultCode = code
+            });
+        }
+
+        public ApiResponse RemoveUser(User user)
+        {
+            var query = String.Format(@"DELETE FROM 'users' WHERE users.`id` = {0}", user.Id);
+
+            return EditItem(query, (code) => new ApiResponse()
+            {
+                IsSuccess = code > 0,
+                ResultCode = code
+            });
         }
 
         /// <summary>
@@ -843,22 +908,6 @@ namespace EgzaminelAPI.DataAccess
         #endregion
 
         #region NOT_IMPLEMENTED
-
-        public ApiResponse AddUser(User user)
-        {
-            throw new NotImplementedException();
-        }
-
-        public ApiResponse EditUser(User user)
-        {
-            throw new NotImplementedException();
-        }
-
-        public ApiResponse RemoveUser(User user)
-        {
-            throw new NotImplementedException();
-        }
-
         #endregion
     }
 }
