@@ -9,8 +9,9 @@ namespace EgzaminelAPI.Context
 {
     public interface IUsersContext
     {
-        User GetUser(int id);
+        User GetUserData(string username, string password);
         ApiResponse RegisterUser(User userBasicData, string password);
+        ApiResponse DeleteUser(string username, string password);
         string ValidateUser(string username, string password);
     }
 
@@ -27,9 +28,28 @@ namespace EgzaminelAPI.Context
             this._repo = repo;
         }
 
-        public User GetUser(int id)
+        public ApiResponse DeleteUser(string username, string password)
         {
-            return _repo.GetUser(id);
+            // Hash userPassword
+            var hashedPassword = this.HashUserPassword(username, password);
+
+            // Try to find user with such credentials
+            var userId = _repo.GetUserId(username, hashedPassword);
+
+            if (userId == null) throw new EgzaminelException(ERROR_CODE.USER_VALIDATION_ERROR);
+
+            return _repo.RemoveUser(userId.Value);
+        }
+
+        public User GetUserData(string username, string password)
+        {
+            var hashedPassword = HashUserPassword(username, password);
+
+            var userId = _repo.GetUserId(username, hashedPassword);
+
+            if (userId == null) throw new EgzaminelException(ERROR_CODE.USER_VALIDATION_ERROR);
+
+            return _repo.GetUser(userId.Value);
         }
 
         public ApiResponse RegisterUser(User userBasicData, string password)
@@ -61,12 +81,9 @@ namespace EgzaminelAPI.Context
             // Try to find user with such credentials
             var userId = _repo.GetUserId(username, hashedPassword);
 
-            if (userId != null)
-            {
-                return _tokenService.GenerateToken(userId.Value).AuthToken;
-            }
+            if (userId == null) throw new EgzaminelException(ERROR_CODE.USER_VALIDATION_ERROR);
 
-            return null;
+            return _tokenService.GenerateToken(userId.Value).AuthToken;
         }
 
         private string HashUserPassword(string username, string password)

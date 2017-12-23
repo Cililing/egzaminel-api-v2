@@ -26,7 +26,7 @@ namespace EgzaminelAPI.DataAccess
         ICollection<User> GetUsers(IEnumerable<int> ids);
         ApiResponse AddUser(User user);
         ApiResponse EditUser(User user);
-        ApiResponse RemoveUser(User user);
+        ApiResponse RemoveUser(int userId);
         IEnumerable<GroupPermission> GetGroupPermission(int userId);
         IEnumerable<SubjectGroupPermission> GetSubjectGroupPermission(int userId);
         ApiResponse CreartePermission(Permission permission);
@@ -265,9 +265,9 @@ namespace EgzaminelAPI.DataAccess
             });
         }
 
-        public ApiResponse RemoveUser(User user)
+        public ApiResponse RemoveUser(int userId)
         {
-            var query = String.Format(@"DELETE FROM 'users' WHERE users.`id` = {0}", user.Id);
+            var query = String.Format(@"DELETE FROM 'users' WHERE users.`id` = {0}", userId);
 
             return EditItem(query, (code) => new ApiResponse()
             {

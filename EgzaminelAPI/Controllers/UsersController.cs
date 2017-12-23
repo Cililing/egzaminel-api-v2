@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using EgzaminelAPI.Context;
 using EgzaminelAPI.Auth;
 using EgzaminelAPI.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace EgzaminelAPI.Helpers
 {
@@ -10,7 +11,6 @@ namespace EgzaminelAPI.Helpers
     {
         void LoginUser(string username, string password);
         ApiResponse RegisterUser(User user);
-        ApiResponse EditUser(User user);
         ApiResponse DeleteUser(string username, string password);
     }
 
@@ -27,13 +27,14 @@ namespace EgzaminelAPI.Helpers
             this._tokenService = tokenService;
         }
 
+        [HttpPost]
+        [Route("delete")]
         public ApiResponse DeleteUser(string username, string password)
         {
-            throw new System.NotImplementedException();
-        }
+            // TODO send credentials as encrypted data
+            var decryptedPassword = password;
 
-        public ApiResponse EditUser(User user)
-        {
+            _usersContext.DeleteUser(username, decryptedPassword);
             throw new System.NotImplementedException();
         }
 
